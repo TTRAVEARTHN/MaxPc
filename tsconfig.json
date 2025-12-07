@@ -1,0 +1,13 @@
+//взять с гпт, это чтобы мы могли использовать тайпскрипт в проекте
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "strict": true,
+        "jsx": "preserve",
+        "sourceMap": true,
+        "esModuleInterop": true
+    },
+    "include": ["resources/js/**/*"]
+}
