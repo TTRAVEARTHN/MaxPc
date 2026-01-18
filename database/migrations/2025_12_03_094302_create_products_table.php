@@ -23,7 +23,6 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
 
-            // 👉 ТЕПЕРЬ JSONB
             $table->jsonb('specs')->nullable();
 
             $table->string('main_image', 255)->nullable();

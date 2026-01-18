@@ -11,10 +11,21 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ContactController;
 
 Route::get('/', function () {
     return view('home');
 })->name('home');
+
+
+
+// CONTACT
+Route::get('/contact', [ContactController::class, 'show'])
+    ->name('contact');
+
+Route::post('/contact', [ContactController::class, 'send'])
+    ->name('contact.send');
+
 
 // Account area
 Route::middleware('auth')->group(function () {

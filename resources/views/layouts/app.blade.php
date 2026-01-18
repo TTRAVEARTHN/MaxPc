@@ -39,8 +39,12 @@
                         Catalog
                     </a>
                 </li>
-
-                <li><a class="nav-link" href="/contact">Contact</a></li>
+                <li>
+                    <a class="nav-link {{ request()->routeIs('contact') ? 'text-white' : '' }}"
+                       href="{{ route('contact') }}">
+                        Contact
+                    </a>
+                </li>
             </ul>
         </div>
 
@@ -106,7 +110,7 @@
 
             <li><a href="{{ route('home') }}" class="mobile-link">Home</a></li>
             <li><a href="{{ route('catalog.index') }}" class="mobile-link">Catalog</a></li>
-            <li><a href="/contact" class="mobile-link">Contact</a></li>
+            <li><a href="{{ route('contact') }}" class="mobile-link">Contact</a></li>
 
             <li class="border-t border-gray-700 my-2"></li>
 
