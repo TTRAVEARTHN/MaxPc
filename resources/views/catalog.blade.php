@@ -12,26 +12,31 @@
             Browse our selection of high-performance PCs and peripherals
         </p>
 
-
+        @php
+            $currentCategory = request('category');
+            $currentSort = request('sort', 'default');
+        @endphp
 
         {{-- =============================== --}}
         {{-- CATEGORY FILTERS --}}
         {{-- =============================== --}}
-        @php
-            $currentCategory = request('category'); // id выбранной категории или null
-        @endphp
-
         <div class="flex gap-3 mb-6">
 
             {{-- ALL PRODUCTS --}}
-            <a href="{{ route('catalog.index') }}"
+            <a href="{{ route('catalog.index', ['sort' => $currentSort !== 'default' ? $currentSort : null]) }}"
+               data-category-link
+               data-category-id=""
                class="{{ $currentCategory ? 'filter-btn' : 'filter-btn-active' }}">
                 All Products
             </a>
 
-            {{-- КАТЕГОРИИ --}}
             @foreach($categories as $cat)
-                <a href="{{ route('catalog.index', ['category' => $cat->id]) }}"
+                <a href="{{ route('catalog.index', [
+                        'category' => $cat->id,
+                        'sort'     => $currentSort !== 'default' ? $currentSort : null
+                     ]) }}"
+                   data-category-link
+                   data-category-id="{{ $cat->id }}"
                    class="{{ (string)$currentCategory === (string)$cat->id ? 'filter-btn-active' : 'filter-btn' }}">
                     {{ $cat->name }}
                 </a>
@@ -39,29 +44,17 @@
 
         </div>
 
-
-
         {{-- =============================== --}}
         {{-- SORTING --}}
         {{-- =============================== --}}
-
-        @php
-            $currentCategory = request('category');
-            $currentSort = request('sort', 'default');
-        @endphp
-
         <div class="flex items-center gap-3 mb-6">
 
             <span class="text-gray-400">Sort by:</span>
 
             <form method="GET" id="sortForm">
-
-
-                {{-- если выбрана категория передаём её вместе с сортировкой --}}
                 @if($currentCategory)
                     <input type="hidden" name="category" value="{{ $currentCategory }}">
                 @endif
-
 
                 <select name="sort" class="sort-select"
                         onchange="document.querySelector('#sortForm').submit()">
@@ -81,73 +74,24 @@
 
                 </select>
             </form>
-            <span class="text-gray-500 ml-auto">
+
+            <span class="text-gray-500 ml-auto" id="productCount">
                 {{ $products->total() }} products
             </span>
 
         </div>
 
-
-
         {{-- =============================== --}}
-        {{-- PRODUCT GRID --}}
+        {{-- PRODUCT GRID (AJAX-CONTAINER) --}}
         {{-- =============================== --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-
-            @foreach($products as $product)
-
-                <div class="product-card">
-
-                    <a href="{{ route('product.show', $product) }}">
-                        <img src="{{ asset('storage/' . $product->main_image) }}"
-                             class="product-image"
-                             alt="{{ $product->name }}">
-                    </a>
-
-                    <div class="product-content p-4">
-
-                        <h3 class="product-title">{{ $product->name }}</h3>
-
-                        {{-- SPECS --}}
-                        @if(is_array($product->specs))
-                            <p class="product-spec">
-                                {{ $product->specs['cpu'] ?? '' }}<br>
-                                {{ $product->specs['gpu'] ?? '' }}<br>
-                                {{ $product->specs['ram'] ?? '' }}
-                            </p>
-                        @endif
-
-                        <p class="product-price">
-                            ${{ number_format($product->price, 0) }}
-                        </p>
-
-                        <div class="flex justify-between mt-4">
-                            <a href="{{ route('product.show', $product) }}"
-                               class="details-btn">
-                                Details
-                            </a>
-
-                            <form method="POST" action="{{ route('cart.add', $product->id) }}">
-                                @csrf
-                                <button class="cart-btn">
-                                    Add to Cart
-                                </button>
-                            </form>
-                        </div>
-
-                    </div>
-
-                </div>
-
-            @endforeach
-
+        <div id="catalogGrid">
+            @include('partials.catalog_grid', ['products' => $products])
         </div>
 
-
-
         {{-- =============================== --}}
-        {{-- PAGINATION / LOAD MORE --}}
+        {{-- PAGINATION / LOAD MORE (пока можно оставить как было или убрать) --}}
         {{-- =============================== --}}
+        {{--
         <div class="flex justify-center mt-10">
             @if($products->hasMorePages())
                 <a href="{{ $products->nextPageUrl() }}"
@@ -156,6 +100,7 @@
                 </a>
             @endif
         </div>
+        --}}
 
     </div>
 
