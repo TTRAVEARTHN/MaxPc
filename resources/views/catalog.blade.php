@@ -44,22 +44,43 @@
         {{-- =============================== --}}
         {{-- SORTING --}}
         {{-- =============================== --}}
+
+        @php
+            $currentCategory = request('category');
+            $currentSort = request('sort', 'default');
+        @endphp
+
         <div class="flex items-center gap-3 mb-6">
 
             <span class="text-gray-400">Sort by:</span>
 
             <form method="GET" id="sortForm">
+
+
+                {{-- если выбрана категория передаём её вместе с сортировкой --}}
+                @if($currentCategory)
+                    <input type="hidden" name="category" value="{{ $currentCategory }}">
+                @endif
+
+
                 <select name="sort" class="sort-select"
                         onchange="document.querySelector('#sortForm').submit()">
 
-                    <option value="default">Default</option>
-                    <option value="price_asc">Price ↑</option>
-                    <option value="price_desc">Price ↓</option>
-                    <option value="newest">Newest</option>
+                    <option value="default" {{ $currentSort === 'default' ? 'selected' : '' }}>
+                        Default
+                    </option>
+                    <option value="price_asc" {{ $currentSort === 'price_asc' ? 'selected' : '' }}>
+                        Price ↑
+                    </option>
+                    <option value="price_desc" {{ $currentSort === 'price_desc' ? 'selected' : '' }}>
+                        Price ↓
+                    </option>
+                    <option value="newest" {{ $currentSort === 'newest' ? 'selected' : '' }}>
+                        Newest
+                    </option>
 
                 </select>
             </form>
-
             <span class="text-gray-500 ml-auto">
                 {{ $products->total() }} products
             </span>
