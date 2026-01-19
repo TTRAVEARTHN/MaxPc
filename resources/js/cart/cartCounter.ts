@@ -1,9 +1,7 @@
-document.addEventListener("DOMContentLoaded", () => {
+function syncCartCount() {
     const cartCountEl = document.querySelector<HTMLElement>('#cartCount');
-
     if (!cartCountEl) return;
 
-    // соберём данные из сервера
     fetch('/cart/count', {
         method: 'GET',
         headers: {
@@ -23,26 +21,16 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         })
         .catch(err => console.error('Cart counter sync error:', err));
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    syncCartCount();
 });
 
-// реакция на bfcache (назад/вперёд)
 window.addEventListener("pageshow", (event) => {
+    // если страница вернулась из bfcache (назад/вперёд) — пересинхронизируем
     if (event.persisted) {
-        fetch('/cart/count')
-            .then(res => res.json())
-            .then(data => {
-                const cartCountEl = document.querySelector<HTMLElement>('#cartCount');
-                const count = Number(data.count ?? 0);
-
-                if (!cartCountEl) return;
-
-                if (count > 0) {
-                    cartCountEl.textContent = String(count);
-                    cartCountEl.classList.remove('hidden');
-                } else {
-                    cartCountEl.classList.add('hidden');
-                }
-            });
+        syncCartCount();
     }
 });
 
