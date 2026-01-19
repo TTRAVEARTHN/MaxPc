@@ -38,11 +38,12 @@
                             </div>
                         </div>
 
-                        {{-- QUANTITY CONTROLS --}}
                         <div class="flex items-center gap-3">
 
                             {{-- Minus --}}
-                            <form method="POST" action="{{ route('cart.update', $item->id) }}">
+                            <form method="POST"
+                                  action="{{ route('cart.update', $item->id) }}"
+                                  data-cart-form="update">
                                 @csrf
                                 @method('PATCH')
                                 <input type="hidden" name="quantity"
@@ -50,10 +51,16 @@
                                 <button class="qty-btn">−</button>
                             </form>
 
-                            <span class="text-lg">{{ $item->quantity }}</span>
+                            {{-- ВОТ ЭТОТ СПАН ДОЛЖЕН БЫТЬ--}}
+
+                            <span class="text-lg">
+                                {{ $item->quantity }}
+                            </span>
 
                             {{-- Plus --}}
-                            <form method="POST" action="{{ route('cart.update', $item->id) }}">
+                            <form method="POST"
+                                  action="{{ route('cart.update', $item->id) }}"
+                                  data-cart-form="update">
                                 @csrf
                                 @method('PATCH')
                                 <input type="hidden" name="quantity"
@@ -62,7 +69,9 @@
                             </form>
 
                             {{-- Delete --}}
-                            <form method="POST" action="{{ route('cart.remove', $item->id) }}">
+                            <form method="POST"
+                                  action="{{ route('cart.remove', $item->id) }}"
+                                  data-cart-form="remove">
                                 @csrf
                                 @method('DELETE')
                                 <button class="delete-btn">🗑</button>

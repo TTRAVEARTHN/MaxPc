@@ -10,6 +10,8 @@ import "./validation/register";
 import "./validation/login";
 import "./catalog/categoryFilter";
 import "./cart/cartAjax";
+import "./cart/cartCounter";
+import "./cart/cartAfterActions";
 
 // only mount App.vue if there's a #app element in the page
 if (document.getElementById('app')) {

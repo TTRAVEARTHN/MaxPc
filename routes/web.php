@@ -39,6 +39,22 @@ Route::middleware('auth')->group(function () {
 
 });
 
+Route::get('/cart/count', [CartController::class, 'count'])
+    ->name('cart.count');
+Route::get('/cart/count', function() {
+    if (!auth()->check()) {
+        return response()->json(['count' => 0]);
+    }
+
+    $cart = auth()->user()->cart;
+
+    $count = $cart
+        ? $cart->items()->sum('quantity')
+        : 0;
+
+    return response()->json(['count' => $count]);
+});
+
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin', function () {
         return 'Admin Dashboard';

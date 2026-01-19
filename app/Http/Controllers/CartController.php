@@ -37,7 +37,14 @@ class CartController extends Controller
         $tax = $subtotal * 0.20; // просто чтобы показать
         $total = $subtotal;      // итоговая цена уже содержит VAT
 
-        return view('cart', compact('items', 'subtotal', 'tax', 'total'));
+        //return view('cart', compact('items', 'subtotal', 'tax', 'total'));
+
+        $response = response()->view('cart', compact('items', 'subtotal', 'tax', 'total'));
+
+        return $response
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 
     /**
@@ -111,15 +118,20 @@ class CartController extends Controller
 
         $item->update(['quantity' => $request->quantity]);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+
         return back()->with('success', 'Cart updated.');
     }
 
-    /**
-     * Remove item
-     */
-    public function remove(CartItem $item)
+    public function remove(Request $request, CartItem $item)
     {
         $item->delete();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
 
         return back()->with('success', 'Item removed.');
     }
@@ -138,5 +150,18 @@ class CartController extends Controller
         }
 
         return back()->with('success', 'Cart cleared.');
+    }
+
+    public function count()
+    {
+        if (!Auth::check()) {
+            return response()->json(['count' => 0]);
+        }
+
+        $cart = Cart::with('items')->where('user_id', Auth::id())->first();
+
+        $count = $cart ? $cart->items->sum('quantity') : 0;
+
+        return response()->json(['count' => $count]);
     }
 }
