@@ -15,37 +15,42 @@ class ProductController extends Controller
     {
         $query = Product::with('category');
 
-        //
-        // 🔹 ФИЛЬТР ПО КАТЕГОРИИ
-        //
         if ($request->has('category') && $request->category !== null) {
             $query->where('category_id', $request->category);
         }
 
-        //
-        // 🔹 СОРТИРОВКА
-        //
+
         switch ($request->sort) {
             case 'price_asc':
                 $query->orderBy('price', 'asc');
                 break;
-
             case 'price_desc':
                 $query->orderBy('price', 'desc');
                 break;
-
             case 'newest':
                 $query->orderBy('created_at', 'desc');
                 break;
-
             default:
                 $query->orderBy('id', 'asc');
         }
 
-        return view('catalog', [
-            'products'    => $query->paginate(12),
-            'categories'  => Category::all(),
-        ]);
+        $products   = $query->paginate(12);
+        $categories = Category::all();
+
+
+        if ($request->ajax()) {
+            $html = view('partials.catalog_grid', compact('products'))->render();
+
+
+            return response()->json([
+                'html'  => $html,
+                'total' => $products->total(),
+
+            ]);
+        }
+
+
+        return view('catalog', compact('products', 'categories'));
     }
 
 

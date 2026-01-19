@@ -1,55 +1,86 @@
 document.addEventListener("DOMContentLoaded", () => {
     const categoryLinks = document.querySelectorAll<HTMLAnchorElement>('[data-category-link]');
-    const catalogGrid   = document.querySelector<HTMLDivElement>('#catalogGrid');
-    const productCount  = document.querySelector<HTMLElement>('#productCount');
+    const catalogGridRaw   = document.querySelector<HTMLDivElement>('#catalogGrid');
+    const productCountRaw  = document.querySelector<HTMLElement>('#productCount');
+    const sortSelect       = document.querySelector<HTMLSelectElement>('#sortSelect');
 
-    if (!categoryLinks.length || !catalogGrid || !productCount) {
+
+    // если нужных элементов нет — выходим и вообще ничего не делаем
+    if (!catalogGridRaw || !productCountRaw) {
         return;
     }
 
 
-    categoryLinks.forEach(link => {
-        link.addEventListener("click", (e) => {
+    // после проверки TS понимает, что это уже НЕ null
+    const catalogGrid  = catalogGridRaw;
+    const productCount = productCountRaw;
+
+    // общая функция загрузки каталога по URL
+    function loadCatalog(url: string): void {
+        fetch(url, {
+            method: "GET",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "Accept": "application/json",
+            },
+        })
+            .then((response: Response) => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
+            .then((data: any) => {
+                catalogGrid.innerHTML = data.html;
+                productCount.textContent = `${data.total} products`;
+                window.history.pushState({}, "", url);
+            })
+            .catch(err => {
+                console.error("Catalog AJAX error:", err);
+            });
+    }
+
+
+    if (categoryLinks.length) {
+        categoryLinks.forEach(link => {
+            link.addEventListener("click", (e) => {
+                e.preventDefault();
+
+                const url = link.href;
+
+                // переключаем активную категорию
+                categoryLinks.forEach(l => {
+                    l.classList.remove("filter-btn-active");
+                    l.classList.add("filter-btn");
+                });
+                link.classList.remove("filter-btn");
+                link.classList.add("filter-btn-active");
+
+                loadCatalog(url);
+            });
+        });
+    }
+
+
+
+    if (sortSelect) {
+        sortSelect.addEventListener("change", (e) => {
             e.preventDefault();
 
-            const url = link.href;
+            const params = new URLSearchParams(window.location.search);
+            const selectedSort = sortSelect.value;
 
-            // переключаем активную категорию по классам
-            categoryLinks.forEach(l => {
-                l.classList.remove("filter-btn-active");
-                l.classList.add("filter-btn");
-            });
-            link.classList.remove("filter-btn");
-            link.classList.add("filter-btn-active");
+            if (selectedSort === "default") {
+                params.delete("sort");
+            } else {
+                params.set("sort", selectedSort);
+            }
 
+            const baseUrl = "/catalog";
+            const query   = params.toString();
+            const url     = query ? `${baseUrl}?${query}` : baseUrl;
 
-            fetch(url, {
-                method: "GET",
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest",
-                    "Accept": "application/json",
-                },
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Network response was not ok");
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // подменяем грид
-
-                    catalogGrid.innerHTML = data.html;
-                    // обновляем счётчик
-
-                    productCount.textContent = `${data.total} products`;
-
-
-                    window.history.pushState({}, "", url);
-                })
-                .catch(err => {
-                    console.error("Catalog AJAX error:", err);
-                });
+            loadCatalog(url);
         });
-    });
+    }
 });

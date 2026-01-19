@@ -8,6 +8,7 @@ import './ui/dropdown';
 import './ui/mobileMenu';
 import "./validation/register";
 import "./validation/login";
+import "./catalog/categoryFilter";
 
 // only mount App.vue if there's a #app element in the page
 if (document.getElementById('app')) {

@@ -44,9 +44,6 @@
 
         </div>
 
-        {{-- =============================== --}}
-        {{-- SORTING --}}
-        {{-- =============================== --}}
         <div class="flex items-center gap-3 mb-6">
 
             <span class="text-gray-400">Sort by:</span>
@@ -56,9 +53,7 @@
                     <input type="hidden" name="category" value="{{ $currentCategory }}">
                 @endif
 
-                <select name="sort" class="sort-select"
-                        onchange="document.querySelector('#sortForm').submit()">
-
+                <select id="sortSelect" name="sort" class="sort-select">
                     <option value="default" {{ $currentSort === 'default' ? 'selected' : '' }}>
                         Default
                     </option>
@@ -71,13 +66,12 @@
                     <option value="newest" {{ $currentSort === 'newest' ? 'selected' : '' }}>
                         Newest
                     </option>
-
                 </select>
             </form>
 
             <span class="text-gray-500 ml-auto" id="productCount">
-                {{ $products->total() }} products
-            </span>
+        {{ $products->total() }} products
+    </span>
 
         </div>
 
