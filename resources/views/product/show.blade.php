@@ -73,7 +73,9 @@
 
                 <div class="flex gap-4 mt-8">
 
-                    <form method="POST" action="{{ route('cart.add', $product->id) }}">
+                    <form method="POST"
+                          action="{{ route('cart.add', $product->id) }}"
+                          data-cart-form="add">
                         @csrf
                         <button class="blue-btn px-6 py-3 rounded-lg">
                             Add to Cart

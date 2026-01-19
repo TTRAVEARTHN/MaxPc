@@ -43,9 +43,23 @@ class CartController extends Controller
     /**
      * Add product to cart
      */
-    public function add(Product $product)
+    public function add(Request $request, Product $product)
     {
+
+
         if (!Auth::check()) {
+            // AJAX-ответ
+            if ($request->boolean('ajax')) {
+                return response()->json([
+                    'success' => false,
+                    'redirect_to_login' => true,
+                    'login_url' => route('login.form'),
+                    'message' => 'You must be logged in to use the cart.',
+                ], 401);
+            }
+
+
+
             return redirect()->route('login.form')
                 ->with('error', 'You must be logged in to use the cart.');
         }
@@ -58,6 +72,7 @@ class CartController extends Controller
             ->where('product_id', $product->id)
             ->first();
 
+
         if ($item) {
             $item->quantity += 1;
             $item->save();
@@ -69,7 +84,19 @@ class CartController extends Controller
             ]);
         }
 
+        // считаем общее количество товаров в корзине
+        $totalQty = $cart->items()->sum('quantity');
 
+        // ответ
+        if ($request->boolean('ajax')) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Product added to cart!',
+                'count'   => $totalQty,
+            ]);
+        }
+
+        // обычный случай
         return back()->with('success', 'Product added to cart!');
     }
 

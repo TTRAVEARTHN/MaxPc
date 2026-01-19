@@ -53,7 +53,9 @@
                         </form>
                     @endif
 
-                    <form method="POST" action="{{ route('cart.add', $product->id) }}">
+                    <form method="POST"
+                          action="{{ route('cart.add', $product->id) }}"
+                          data-cart-form="add">
                         @csrf
                         <button class="cart-btn">
                             Add to Cart

@@ -102,7 +102,28 @@
                 @endguest
             </div>
 
-            <a href="/cart" class="nav-btn">Cart</a>
+            @php
+                use App\Models\Cart;
+
+                $cartCount = 0;
+
+                if (Auth::check()) {
+                    $cart = Cart::with('items')->where('user_id', Auth::id())->first();
+                    if ($cart) {
+                        $cartCount = $cart->items->sum('quantity');
+                    }
+                }
+
+            @endphp
+
+            <a href="{{ route('cart.index') }}" class="nav-btn relative">
+                Cart
+                <span id="cartCount"
+                      class="ml-1 text-xs bg-blue-500 px-1.5 py-0.5 rounded {{ $cartCount ? '' : 'hidden' }}">
+                        {{ $cartCount }}
+                </span>
+
+            </a>
         </div>
 
         {{-- HAMBURGER (only mobile) --}}
