@@ -66,7 +66,11 @@
 
 
 
-                {{-- BUTTONS --}}
+                @php
+                    $pcCategories = ['Gaming PCs', 'Workstations', 'Office PCs'];
+                    $isPc = $product->category && in_array($product->category->name, $pcCategories);
+                @endphp
+
                 <div class="flex gap-4 mt-8">
 
                     <form method="POST" action="{{ route('cart.add', $product->id) }}">
@@ -76,12 +80,14 @@
                         </button>
                     </form>
 
-                    <form method="POST" action="{{ route('compare.add', $product->id) }}">
-                        @csrf
-                        <button type="submit" class="gray-btn px-6 py-3 rounded-lg">
-                            Add to Compare
-                        </button>
-                    </form>
+                    @if($isPc)
+                        <form method="POST" action="{{ route('compare.add', $product->id) }}">
+                            @csrf
+                            <button type="submit" class="gray-btn px-6 py-3 rounded-lg">
+                                Add to Compare
+                            </button>
+                        </form>
+                    @endif
 
                     <a href="{{ route('catalog.index') }}"
                        class="gray-btn px-6 py-3 rounded-lg">

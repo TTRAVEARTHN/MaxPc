@@ -8,6 +8,7 @@ use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CompareController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -123,6 +124,11 @@ Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear
 
 Route::post('/checkout', [CheckoutController::class, 'process'])->name('checkout');
 
+// COMPARE
+Route::get('/compare', [CompareController::class, 'index'])->name('compare.index');
+Route::post('/compare/add/{product}', [CompareController::class, 'add'])->name('compare.add');
+Route::delete('/compare/remove/{product}', [CompareController::class, 'remove'])->name('compare.remove');
+Route::delete('/compare/clear', [CompareController::class, 'clear'])->name('compare.clear');
 
 
 Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');

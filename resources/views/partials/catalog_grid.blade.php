@@ -31,6 +31,11 @@
                 </p>
 
 
+                @php
+                    $pcCategories = ['Gaming PCs', 'Workstations', 'Office PCs'];
+                    $isPc = $product->category && in_array($product->category->name, $pcCategories);
+                @endphp
+
                 <div class="flex justify-between mt-4 gap-2">
 
                     <a href="{{ route('product.show', $product) }}"
@@ -38,12 +43,15 @@
                         Details
                     </a>
 
-                    <form method="POST" action="{{ route('compare.add', $product->id) }}">
-                        @csrf
-                        <button type="submit" class="gray-btn px-3 py-1 text-sm">
-                            Compare
-                        </button>
-                    </form>
+                    {{-- только для ПК --}}
+                    @if($isPc)
+                        <form method="POST" action="{{ route('compare.add', $product->id) }}">
+                            @csrf
+                            <button type="submit" class="gray-btn px-3 py-1 text-sm">
+                                Compare
+                            </button>
+                        </form>
+                    @endif
 
                     <form method="POST" action="{{ route('cart.add', $product->id) }}">
                         @csrf
@@ -53,6 +61,7 @@
                     </form>
 
                 </div>
+
 
             </div>
 

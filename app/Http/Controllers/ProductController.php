@@ -38,19 +38,18 @@ class ProductController extends Controller
         $categories = Category::all();
 
 
-        if ($request->ajax()) {
+        if ($request->boolean('ajax')) {
             $html = view('partials.catalog_grid', compact('products'))->render();
-
 
             return response()->json([
                 'html'  => $html,
                 'total' => $products->total(),
-
             ]);
         }
 
-
+        // Обычное HTML при прямом заходе /catalog?category=4
         return view('catalog', compact('products', 'categories'));
+
     }
 
 
