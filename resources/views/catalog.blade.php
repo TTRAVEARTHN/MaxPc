@@ -17,16 +17,22 @@
         {{-- =============================== --}}
         {{-- CATEGORY FILTERS --}}
         {{-- =============================== --}}
+        @php
+            $currentCategory = request('category'); // id выбранной категории или null
+        @endphp
+
         <div class="flex gap-3 mb-6">
 
+            {{-- ALL PRODUCTS --}}
             <a href="{{ route('catalog.index') }}"
-               class="filter-btn-active">
+               class="{{ $currentCategory ? 'filter-btn' : 'filter-btn-active' }}">
                 All Products
             </a>
 
+            {{-- КАТЕГОРИИ --}}
             @foreach($categories as $cat)
                 <a href="{{ route('catalog.index', ['category' => $cat->id]) }}"
-                   class="filter-btn">
+                   class="{{ (string)$currentCategory === (string)$cat->id ? 'filter-btn-active' : 'filter-btn' }}">
                     {{ $cat->name }}
                 </a>
             @endforeach
