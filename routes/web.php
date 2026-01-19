@@ -55,6 +55,9 @@ Route::get('/cart/count', function() {
     return response()->json(['count' => $count]);
 });
 
+Route::get('/compare/count', [CompareController::class, 'count'])
+    ->name('compare.count');
+
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin', function () {
         return 'Admin Dashboard';

@@ -165,7 +165,6 @@ class CompareController extends Controller
      */
     public function count()
     {
-        // ВЕЗДЕ используем один и тот же ключ 'compare'
         $ids = session('compare', []);
 
         return response()->json([

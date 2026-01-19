@@ -57,7 +57,11 @@
                           action="{{ route('cart.add', $product->id) }}"
                           data-cart-form="add">
                         @csrf
-                        <button class="cart-btn">
+                        <button
+                            type="button"
+                            class="cart-btn"
+                            data-cart-add="1"
+                        >
                             Add to Cart
                         </button>
                     </form>

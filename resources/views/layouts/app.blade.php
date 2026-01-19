@@ -51,15 +51,21 @@
         {{-- RIGHT SIDE (desktop only) --}}
         <div class="hidden md:flex items-center gap-3">
             @php
-                $compareIds   = session('compare.products', []);
+                $compareIds = session('compare', []);
                 $compareCount = is_array($compareIds) ? count($compareIds) : 0;
+
+                $cart = auth()->check()
+                    ? \App\Models\Cart::with('items')->where('user_id', auth()->id())->first()
+                    : null;
+                $cartCount = $cart ? $cart->items->sum('quantity') : 0;
             @endphp
 
             <a href="{{ route('compare.index') }}" class="nav-btn relative">
                 Compare
                 <span id="compareCount"
-                      class="ml-1 text-xs bg-blue-500 px-1.5 py-0.5 rounded {{ $compareCount ? '' : 'hidden' }}">
-                     {{ $compareCount }}
+                      class="ml-1 px-2 py-0.5 text-xs rounded bg-blue-500
+                 {{ $compareCount > 0 ? '' : 'hidden' }}">
+                    {{ $compareCount }}
                 </span>
             </a>
 

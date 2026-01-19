@@ -52,33 +52,25 @@ class CartController extends Controller
      */
     public function add(Request $request, Product $product)
     {
-
-
         if (!Auth::check()) {
-            // AJAX-ответ
             if ($request->boolean('ajax')) {
                 return response()->json([
                     'success' => false,
                     'redirect_to_login' => true,
                     'login_url' => route('login.form'),
-                    'message' => 'You must be logged in to use the cart.',
-                ], 401);
+                ]);
             }
-
-
 
             return redirect()->route('login.form')
                 ->with('error', 'You must be logged in to use the cart.');
         }
 
         $user = Auth::user();
-
         $cart = Cart::firstOrCreate(['user_id' => $user->id]);
 
         $item = CartItem::where('cart_id', $cart->id)
             ->where('product_id', $product->id)
             ->first();
-
 
         if ($item) {
             $item->quantity += 1;
@@ -87,23 +79,21 @@ class CartController extends Controller
             CartItem::create([
                 'cart_id' => $cart->id,
                 'product_id' => $product->id,
-                'quantity' => 1
+                'quantity' => 1,
             ]);
         }
 
-        // считаем общее количество товаров в корзине
-        $totalQty = $cart->items()->sum('quantity');
+        // пересчитываем общее количество позиций
+        $count = CartItem::where('cart_id', $cart->id)->sum('quantity');
 
-        // ответ
         if ($request->boolean('ajax')) {
             return response()->json([
                 'success' => true,
                 'message' => 'Product added to cart!',
-                'count'   => $totalQty,
+                'count'   => $count,
             ]);
         }
 
-        // обычный случай
         return back()->with('success', 'Product added to cart!');
     }
 
