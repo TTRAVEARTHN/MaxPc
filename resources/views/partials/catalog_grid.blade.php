@@ -31,10 +31,19 @@
                 </p>
 
 
-                <div class="flex justify-between mt-4">
-                    <a href="{{ route('product.show', $product) }}" class="details-btn">
+                <div class="flex justify-between mt-4 gap-2">
+
+                    <a href="{{ route('product.show', $product) }}"
+                       class="details-btn">
                         Details
                     </a>
+
+                    <form method="POST" action="{{ route('compare.add', $product->id) }}">
+                        @csrf
+                        <button type="submit" class="gray-btn px-3 py-1 text-sm">
+                            Compare
+                        </button>
+                    </form>
 
                     <form method="POST" action="{{ route('cart.add', $product->id) }}">
                         @csrf
@@ -42,6 +51,7 @@
                             Add to Cart
                         </button>
                     </form>
+
                 </div>
 
             </div>

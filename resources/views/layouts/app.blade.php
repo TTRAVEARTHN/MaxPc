@@ -50,8 +50,15 @@
 
         {{-- RIGHT SIDE (desktop only) --}}
         <div class="hidden md:flex items-center gap-3">
-
-            <button class="nav-btn">Compare</button>
+            @php $compareCount = count(session('compare', [])); @endphp
+            <a href="{{ route('compare.index') }}" class="nav-btn">
+                Compare
+                @if($compareCount)
+                    <span class="ml-1 text-xs bg-blue-500 px-1.5 py-0.5 rounded">
+                        {{ $compareCount }}
+                     </span>
+                @endif
+            </a>
 
             {{-- ACCOUNT DROPDOWN --}}
             <div class="relative">
@@ -69,8 +76,10 @@
 
                                 @if(Auth::user()->role === 'admin')
                                     <div class="border-t border-gray-700 my-2"></div>
-                                    <a href="{{ route('admin.products') }}" class="dropdown-link block px-4 py-2">Manage Products</a>
-                                    <a href="{{ route('admin.orders') }}" class="dropdown-link block px-4 py-2">Manage Orders</a>
+                                    <a href="{{ route('admin.products') }}" class="dropdown-link block px-4 py-2">Manage
+                                        Products</a>
+                                    <a href="{{ route('admin.orders') }}" class="dropdown-link block px-4 py-2">Manage
+                                        Orders</a>
                                     <a href="{{ route('admin.users') }}" class="dropdown-link block px-4 py-2">Users</a>
                                 @endif
 
@@ -143,15 +152,12 @@
 </header>
 
 
-
-
 {{-- =========================== --}}
 {{-- MAIN CONTENT --}}
 {{-- =========================== --}}
 <main>
     @yield('content')
 </main>
-
 
 
 {{-- =========================== --}}

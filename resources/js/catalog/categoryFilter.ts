@@ -17,10 +17,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // общая функция загрузки каталога по URL
     function loadCatalog(url: string): void {
-        fetch(url, {
+        const apiUrl = url.includes("?") ? `${url}&ajax=1` : `${url}?ajax=1`;
+
+        fetch(apiUrl, {
             method: "GET",
             headers: {
-                "X-Requested-With": "XMLHttpRequest",
                 "Accept": "application/json",
             },
         })
@@ -33,6 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
             .then((data: any) => {
                 catalogGrid.innerHTML = data.html;
                 productCount.textContent = `${data.total} products`;
+
+                // В историю пишем красивый URL БЕЗ ajax=1
                 window.history.pushState({}, "", url);
             })
             .catch(err => {
