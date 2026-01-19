@@ -21,70 +21,155 @@ class CompareController extends Controller
         return view('compare.index', compact('products'));
     }
 
-
     /**
-     * Удалить один товар из сравнения.
+     * Добавить товар в сравнение.
      */
-    public function remove(Product $product)
+    public function add(Request $request, Product $product)
     {
         $compare = session('compare', []);
-
-        $compare = array_values(array_filter($compare, fn($id) => $id !== $product->id));
-
-        session(['compare' => $compare]);
-
-        return back()->with('success', 'Product removed from compare.');
-    }
-
-
-
-    /**
-     * Очистить список сравнения.
-     */
-    public function clear()
-    {
-        session()->forget('compare');
-
-        return back()->with('success', 'Compare list cleared.');
-    }
-
-    public function add(Product $product)
-    {
-        $compare = session('compare', []);
-
 
         // уже есть в сравнении
         if (in_array($product->id, $compare)) {
-            return back()->with('info', 'Product is already in compare list.');
+            $message = 'Product is already in compare list.';
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                    'count'   => count($compare),
+                ]);
+            }
+
+            return back()->with('info', $message);
         }
 
-        // максимум 4 товара (можешь поменять число)
+        // максимум 4 товара
         if (count($compare) >= 4) {
-            return back()->with('error', 'You can compare up to 4 products.');
+            $message = 'You can compare up to 4 products.';
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                    'count'   => count($compare),
+                ]);
+            }
+
+            return back()->with('error', $message);
         }
 
-
-
-        $categoryName = optional($product->category)->name;
+        // разрешаем только ПК-категории
+        $categoryName        = optional($product->category)->name;
         $allowedPcCategories = ['Gaming PCs', 'Workstations', 'Office PCs'];
 
         if (!in_array($categoryName, $allowedPcCategories)) {
-            return back()->with('error', 'Only desktop PCs can be compared.');
+            $message = 'Only desktop PCs can be compared.';
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                    'count'   => count($compare),
+                ]);
+            }
+
+            return back()->with('error', $message);
         }
 
-        // если в списке уже есть товары — проверяем, что все они тоже из allowedPcCategories
+        // если в списке уже есть товары — проверяем, что первый тоже из списка разрешённых
         if (!empty($compare)) {
-            $firstProduct = Product::with('category')->find(reset($compare));
+            $firstProduct      = Product::with('category')->find(reset($compare));
             $firstCategoryName = optional($firstProduct->category)->name;
 
             if (!in_array($firstCategoryName, $allowedPcCategories)) {
-                return back()->with('error', 'Compare list already contains non-PC products.');
+                $message = 'Compare list already contains non-PC products.';
+
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $message,
+                        'count'   => count($compare),
+                    ]);
+                }
+
+                return back()->with('error', $message);
             }
         }
+
+        // всё ок — добавляем
 
         $compare[] = $product->id;
         session(['compare' => $compare]);
 
-        return back()->with('success', 'Product added to compare.');
+        $message = 'Product added to compare.';
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'count'   => count($compare),
+            ]);
+        }
+
+        return back()->with('success', $message);
+    }
+
+    /**
+     * Удалить один товар из сравнения.
+     */
+    public function remove(Request $request, Product $product)
+    {
+        $compare = session('compare', []);
+
+        $compare = array_values(
+            array_filter($compare, fn($id) => (int)$id !== (int)$product->id)
+        );
+
+        session(['compare' => $compare]);
+
+        $message = 'Product removed from compare.';
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'count'   => count($compare),
+            ]);
+        }
+
+        return back()->with('success', $message);
+    }
+
+    /**
+     * Очистить список сравнения.
+     */
+    public function clear(Request $request)
+    {
+        session()->forget('compare');
+
+        $message = 'Compare list cleared.';
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'count'   => 0,
+            ]);
+        }
+
+        return back()->with('success', $message);
+    }
+
+    /**
+     * Вернуть только количество товаров в сравнении (для бейджика и pageshow).
+     */
+    public function count()
+    {
+        // ВЕЗДЕ используем один и тот же ключ 'compare'
+        $ids = session('compare', []);
+
+        return response()->json([
+            'count' => is_array($ids) ? count($ids) : 0,
+        ]);
     }
 }

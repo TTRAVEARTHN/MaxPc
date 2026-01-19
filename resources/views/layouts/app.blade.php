@@ -50,14 +50,17 @@
 
         {{-- RIGHT SIDE (desktop only) --}}
         <div class="hidden md:flex items-center gap-3">
-            @php $compareCount = count(session('compare', [])); @endphp
-            <a href="{{ route('compare.index') }}" class="nav-btn">
+            @php
+                $compareIds   = session('compare.products', []);
+                $compareCount = is_array($compareIds) ? count($compareIds) : 0;
+            @endphp
+
+            <a href="{{ route('compare.index') }}" class="nav-btn relative">
                 Compare
-                @if($compareCount)
-                    <span class="ml-1 text-xs bg-blue-500 px-1.5 py-0.5 rounded">
-                        {{ $compareCount }}
-                     </span>
-                @endif
+                <span id="compareCount"
+                      class="ml-1 text-xs bg-blue-500 px-1.5 py-0.5 rounded {{ $compareCount ? '' : 'hidden' }}">
+                     {{ $compareCount }}
+                </span>
             </a>
 
             {{-- ACCOUNT DROPDOWN --}}

@@ -24,7 +24,8 @@
         @else
 
             {{-- очистить весь список --}}
-            <form method="POST" action="{{ route('compare.clear') }}" class="mb-4">
+            <form method="POST" action="{{ route('compare.clear') }}" class="mb-4"
+                data-compare-form="clear">
                 @csrf
                 @method('DELETE')
                 <button class="gray-btn px-4 py-2">
@@ -66,13 +67,14 @@
                                         </div>
                                     </div>
 
-                                    <form method="POST" action="{{ route('compare.remove', $p->id) }}">
+                                    <form method="POST"
+                                          action="{{ route('compare.remove', $p->id) }}"
+                                          data-compare-form="remove">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="text-red-400 text-sm">
-                                            ✕
-                                        </button>
+                                        <button class="gray-btn px-3 py-1 text-sm">Remove</button>
                                     </form>
+
                                 </div>
 
                             </th>
