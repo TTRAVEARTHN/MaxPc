@@ -108,10 +108,15 @@ class CartController extends Controller
 
         $item->update(['quantity' => $request->quantity]);
 
+        // если AJAX – отдаём JSON
         if ($request->ajax() || $request->wantsJson()) {
-            return response()->json(['success' => true]);
+            return response()->json([
+                'success'  => true,
+                'quantity' => $item->quantity,
+            ]);
         }
 
+        // fallback на всякий случай
         return back()->with('success', 'Cart updated.');
     }
 
@@ -120,7 +125,10 @@ class CartController extends Controller
         $item->delete();
 
         if ($request->ajax() || $request->wantsJson()) {
-            return response()->json(['success' => true]);
+            return response()->json([
+                'success' => true,
+                'deleted' => true,
+            ]);
         }
 
         return back()->with('success', 'Item removed.');

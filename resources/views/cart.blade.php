@@ -8,20 +8,19 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            {{-- ============================= --}}
             {{-- LEFT COLUMN — CART ITEMS --}}
-            {{-- ============================= --}}
-            <div class="lg:col-span-2 space-y-6">
+            <div class="lg:col-span-2 space-y-6" id="cartItemsWrapper">
 
                 @forelse($items as $item)
-                    <div class="cart-item">
+                    <div class="cart-item"
+                         data-cart-item-id="{{ $item->id }}"
+                         data-price="{{ $item->product->price }}">
 
                         {{-- PRODUCT INFO --}}
                         <div class="flex items-center gap-4">
-
                             <img src="{{ $item->product->main_image
-        ? asset('storage/' . $item->product->main_image)
-        : asset('images/fallback.png') }}"
+                    ? asset('storage/' . $item->product->main_image)
+                    : asset('images/fallback.png') }}"
                                  class="w-24 h-24 rounded object-cover">
 
                             <div>
@@ -51,11 +50,10 @@
                                 <button class="qty-btn">−</button>
                             </form>
 
-                            {{-- ВОТ ЭТОТ СПАН ДОЛЖЕН БЫТЬ--}}
-
-                            <span class="text-lg">
-                                {{ $item->quantity }}
-                            </span>
+                            {{-- тут добавляем класс, чтобы JS мог найти это место --}}
+                            <span class="text-lg cart-qty-display">
+                    {{ $item->quantity }}
+                </span>
 
                             {{-- Plus --}}
                             <form method="POST"
@@ -81,7 +79,9 @@
 
                     </div>
                 @empty
-                    <p class="text-gray-400">Your cart is empty.</p>
+                    <p id="emptyCartMessage" class="text-gray-400">
+                        Your cart is empty.
+                    </p>
                 @endforelse
 
             </div>
@@ -96,12 +96,12 @@
 
                 <div class="summary-row">
                     <span>Subtotal</span>
-                    <span>${{ number_format($subtotal, 2) }}</span>
+                    <span id="cartSubtotal">${{ number_format($subtotal, 2) }}</span>
                 </div>
 
                 <div class="summary-row">
                     <span>Tax (20%)</span>
-                    <span>{{ number_format($tax, 2) }}</span>
+                    <span id="cartTax">{{ number_format($tax, 2) }}</span>
                 </div>
 
                 <div class="summary-row">
@@ -113,7 +113,7 @@
 
                 <div class="summary-total">
                     <span>Total</span>
-                    <span>${{ number_format($total, 2) }}</span>
+                    <span id="cartTotal">${{ number_format($total, 2) }}</span>
                 </div>
 
                 {{-- LOGIN REQUIRED --}}
