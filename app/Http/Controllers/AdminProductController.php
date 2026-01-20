@@ -46,29 +46,38 @@ class AdminProductController extends Controller
             'description' => 'nullable|string',
             'price'       => 'required|numeric|min:0',
             'main_image'  => 'nullable|image|max:2048',
-            'specs'       => 'nullable|string', // accept JSON string from form
+
+            // specs: массив строк "key/value"
+            'specs'           => 'nullable|array',
+            'specs.*.key'     => 'nullable|string|max:255',
+            'specs.*.value'   => 'nullable|string|max:255',
         ]);
 
-        // decode specs JSON to array
-        if (!empty($data['specs'])) {
-            $decoded = json_decode($data['specs'], true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return back()->withErrors(['specs' => 'Invalid JSON in Specifications'])->withInput();
-            }
-            $data['specs'] = $decoded;
-        } else {
-            $data['specs'] = null;
-        }
+        // собрать характеристики в ассоциативный массив
+        $specs = [];
+        if (!empty($data['specs']) && is_array($data['specs'])) {
+            foreach ($data['specs'] as $row) {
+                $key   = isset($row['key'])   ? trim($row['key'])   : '';
+                $value = isset($row['value']) ? trim($row['value']) : '';
 
+                if ($key !== '' && $value !== '') {
+                    $specs[$key] = $value;
+                }
+            }
+        }
+        $data['specs'] = $specs ?: null;
+
+        // картинка
         if ($request->hasFile('main_image')) {
             $data['main_image'] = $request->file('main_image')->store('products', 'public');
         }
 
         Product::create($data);
 
-        return redirect()->route('admin.products')->with('success', 'Product created successfully.');
+        return redirect()
+            ->route('admin.products')
+            ->with('success', 'Product created successfully.');
     }
-
 
     /**
      * Edit page
@@ -83,7 +92,6 @@ class AdminProductController extends Controller
     /**
      * Update product
      */
-    // File: app/Http/Controllers/AdminProductController.php (update method only)
     public function update(Request $request, Product $product)
     {
         $data = $request->validate([
@@ -92,19 +100,24 @@ class AdminProductController extends Controller
             'description' => 'nullable|string',
             'price'       => 'required|numeric|min:0',
             'main_image'  => 'nullable|image|max:2048',
-            'specs'       => 'nullable|string', // accept JSON string from form
+
+            'specs'           => 'nullable|array',
+            'specs.*.key'     => 'nullable|string|max:255',
+            'specs.*.value'   => 'nullable|string|max:255',
         ]);
 
-        // decode specs JSON to array
-        if (!empty($data['specs'])) {
-            $decoded = json_decode($data['specs'], true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return back()->withErrors(['specs' => 'Invalid JSON in Specifications'])->withInput();
+        $specs = [];
+        if (!empty($data['specs']) && is_array($data['specs'])) {
+            foreach ($data['specs'] as $row) {
+                $key   = isset($row['key'])   ? trim($row['key'])   : '';
+                $value = isset($row['value']) ? trim($row['value']) : '';
+
+                if ($key !== '' && $value !== '') {
+                    $specs[$key] = $value;
+                }
             }
-            $data['specs'] = $decoded;
-        } else {
-            $data['specs'] = null;
         }
+        $data['specs'] = $specs ?: null;
 
         if ($request->hasFile('main_image')) {
             $data['main_image'] = $request->file('main_image')->store('products', 'public');
@@ -112,10 +125,10 @@ class AdminProductController extends Controller
 
         $product->update($data);
 
-        return redirect()->route('admin.products')
+        return redirect()
+            ->route('admin.products')
             ->with('success', 'Product updated successfully.');
     }
-
 
     /**
      * Delete item
@@ -124,7 +137,8 @@ class AdminProductController extends Controller
     {
         $product->delete();
 
-        return redirect()->route('admin.products')
+        return redirect()
+            ->route('admin.products')
             ->with('success', 'Product deleted.');
     }
 }
