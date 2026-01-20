@@ -13,6 +13,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\FavoriteController;
 
 Route::get('/', function () {
     return view('home');
@@ -152,5 +153,17 @@ Route::delete('/compare/clear', [CompareController::class, 'clear'])->name('comp
 
 Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
 Route::post('/checkout/place', [OrderController::class, 'placeOrder'])->name('checkout.place');
+
+Route::get('/favorites', [FavoriteController::class, 'index'])
+    ->name('favorites.index');
+
+Route::post('/favorites/add/{product}', [FavoriteController::class, 'add'])
+    ->name('favorites.add');
+
+Route::delete('/favorites/remove/{product}', [FavoriteController::class, 'remove'])
+    ->name('favorites.remove');
+
+Route::get('/favorites/count', [FavoriteController::class, 'count'])
+    ->name('favorites.count');
 
 

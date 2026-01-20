@@ -10,52 +10,122 @@ use Illuminate\Support\Facades\Auth;
 class FavoriteController extends Controller
 {
     /**
-     * Show user favorites
+     * Список избранных товаров пользователя.
      */
     public function index()
     {
-        $favorites = Favorite::where('user_id', Auth::id())
-            ->with('product')
+        if (!Auth::check()) {
+            return redirect()
+                ->route('login.form')
+                ->with('error', 'Please log in to see favorites.');
+        }
+
+        $favorites = Favorite::with('product')
+            ->where('user_id', Auth::id())
             ->get();
 
         return view('favorites.index', compact('favorites'));
     }
 
     /**
-     * Add product to favorites
+     * Добавить товар в избранное.
+     * Работает и для обычного POST, и для AJAX (как cart.add).
      */
-    public function store($productId)
+    public function add(Request $request, Product $product)
     {
+        if (!Auth::check()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success'           => false,
+                    'redirect_to_login' => true,
+                    'login_url'         => route('login.form'),
+                ]);
+            }
+
+            return redirect()
+                ->route('login.form')
+                ->with('error', 'Please log in to add favorites.');
+        }
+
         $userId = Auth::id();
 
-        // prevent duplicate favorites
         $exists = Favorite::where('user_id', $userId)
-            ->where('product_id', $productId)
+            ->where('product_id', $product->id)
             ->exists();
 
         if ($exists) {
+            if ($request->expectsJson()) {
+                $count = Favorite::where('user_id', $userId)->count();
+
+                return response()->json([
+                    'success' => true,
+                    'already' => true,
+                    'count'   => $count,
+                ]);
+            }
+
             return back()->with('info', 'Product is already in favorites.');
         }
 
         Favorite::create([
-            'user_id' => $userId,
-            'product_id' => $productId,
+            'user_id'    => $userId,
+            'product_id' => $product->id,
         ]);
 
-        return back()->with('success', 'Added to favorites.');
+        if ($request->expectsJson()) {
+            $count = Favorite::where('user_id', $userId)->count();
+
+            return response()->json([
+                'success' => true,
+                'count'   => $count,
+            ]);
+        }
+
+        return back()->with('success', 'Product added to favorites.');
     }
 
     /**
-     * Remove favorite
+     * Удалить товар из избранного.
      */
-    public function destroy($productId)
+    public function remove(Request $request, Product $product)
     {
-        Favorite::where('user_id', Auth::id())
-            ->where('product_id', $productId)
+        if (!Auth::check()) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false]);
+            }
+
+            return redirect()->route('login.form');
+        }
+
+        $userId = Auth::id();
+
+        Favorite::where('user_id', $userId)
+            ->where('product_id', $product->id)
             ->delete();
+
+        if ($request->expectsJson()) {
+            $count = Favorite::where('user_id', $userId)->count();
+
+            return response()->json([
+                'success' => true,
+                'count'   => $count,
+            ]);
+        }
 
         return back()->with('success', 'Removed from favorites.');
     }
+
+    /**
+     * Счётчик избранного для бейджа в шапке (AJAX).
+     */
+    public function count()
+    {
+        if (!Auth::check()) {
+            return response()->json(['count' => 0]);
+        }
+
+        $count = Favorite::where('user_id', Auth::id())->count();
+
+        return response()->json(['count' => $count]);
+    }
 }
-
-

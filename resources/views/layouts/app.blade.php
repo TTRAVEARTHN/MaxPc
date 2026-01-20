@@ -48,23 +48,50 @@
             </ul>
         </div>
 
+        @php
+            use App\Models\Cart;
+            use App\Models\Favorite;
+
+            // compare из сессии
+            $compareIds   = session('compare', []);
+            $compareCount = is_array($compareIds) ? count($compareIds) : 0;
+
+            $cartCount      = 0;
+            $favoritesCount = 0;
+
+            if (auth()->check()) {
+                $user = auth()->user();
+
+                // корзина
+                $cart = Cart::with('items')->where('user_id', $user->id)->first();
+                if ($cart) {
+                    $cartCount = $cart->items->sum('quantity');
+                }
+
+                // избранное
+                $favoritesCount = Favorite::where('user_id', $user->id)->count();
+            }
+        @endphp
+
         {{-- RIGHT SIDE (desktop only) --}}
         <div class="hidden md:flex items-center gap-3">
-            @php
-                $compareIds = session('compare', []);
-                $compareCount = is_array($compareIds) ? count($compareIds) : 0;
 
-                $cart = auth()->check()
-                    ? \App\Models\Cart::with('items')->where('user_id', auth()->id())->first()
-                    : null;
-                $cartCount = $cart ? $cart->items->sum('quantity') : 0;
-            @endphp
+            {{-- FAVORITES --}}
+            <a href="{{ route('favorites.index') }}" class="nav-btn relative">
+                Favorites
+                <span id="favoritesCount"
+                      class="ml-1 px-2 py-0.5 text-xs rounded bg-blue-500
+                             {{ $favoritesCount > 0 ? '' : 'hidden' }}">
+                    {{ $favoritesCount }}
+                </span>
+            </a>
 
+            {{-- COMPARE --}}
             <a href="{{ route('compare.index') }}" class="nav-btn relative">
                 Compare
                 <span id="compareCount"
                       class="ml-1 px-2 py-0.5 text-xs rounded bg-blue-500
-                 {{ $compareCount > 0 ? '' : 'hidden' }}">
+                             {{ $compareCount > 0 ? '' : 'hidden' }}">
                     {{ $compareCount }}
                 </span>
             </a>
@@ -85,11 +112,15 @@
 
                                 @if(Auth::user()->role === 'admin')
                                     <div class="border-t border-gray-700 my-2"></div>
-                                    <a href="{{ route('admin.products') }}" class="dropdown-link block px-4 py-2">Manage
-                                        Products</a>
-                                    <a href="{{ route('admin.orders') }}" class="dropdown-link block px-4 py-2">Manage
-                                        Orders</a>
-                                    <a href="{{ route('admin.users') }}" class="dropdown-link block px-4 py-2">Users</a>
+                                    <a href="{{ route('admin.products') }}" class="dropdown-link block px-4 py-2">
+                                        Manage Products
+                                    </a>
+                                    <a href="{{ route('admin.orders') }}" class="dropdown-link block px-4 py-2">
+                                        Manage Orders
+                                    </a>
+                                    <a href="{{ route('admin.users') }}" class="dropdown-link block px-4 py-2">
+                                        Users
+                                    </a>
                                 @endif
 
                                 <form method="POST" action="{{ route('logout') }}">
@@ -111,27 +142,13 @@
                 @endguest
             </div>
 
-            @php
-                use App\Models\Cart;
-
-                $cartCount = 0;
-
-                if (Auth::check()) {
-                    $cart = Cart::with('items')->where('user_id', Auth::id())->first();
-                    if ($cart) {
-                        $cartCount = $cart->items->sum('quantity');
-                    }
-                }
-
-            @endphp
-
+            {{-- CART --}}
             <a href="{{ route('cart.index') }}" class="nav-btn relative">
                 Cart
                 <span id="cartCount"
                       class="ml-1 text-xs bg-blue-500 px-1.5 py-0.5 rounded {{ $cartCount ? '' : 'hidden' }}">
-                        {{ $cartCount }}
+                    {{ $cartCount }}
                 </span>
-
             </a>
         </div>
 
@@ -153,7 +170,41 @@
 
             <li class="border-t border-gray-700 my-2"></li>
 
-            <li><a href="#" class="mobile-link">Compare</a></li>
+            {{-- FAVORITES + COMPARE + CART c теми же счётчиками --}}
+            <li>
+                <a href="{{ route('favorites.index') }}" class="mobile-link flex items-center justify-between">
+                    <span>Favorites</span>
+                    @if($favoritesCount > 0)
+                        <span class="ml-2 text-xs bg-blue-500 px-1.5 py-0.5 rounded">
+                            {{ $favoritesCount }}
+                        </span>
+                    @endif
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('compare.index') }}" class="mobile-link flex items-center justify-between">
+                    <span>Compare</span>
+                    @if($compareCount > 0)
+                        <span class="ml-2 text-xs bg-blue-500 px-1.5 py-0.5 rounded">
+                            {{ $compareCount }}
+                        </span>
+                    @endif
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('cart.index') }}" class="mobile-link flex items-center justify-between">
+                    <span>Cart</span>
+                    @if($cartCount > 0)
+                        <span class="ml-2 text-xs bg-blue-500 px-1.5 py-0.5 rounded">
+                            {{ $cartCount }}
+                        </span>
+                    @endif
+                </a>
+            </li>
+
+            <li class="border-t border-gray-700 my-2"></li>
 
             @auth
                 <li><a href="{{ route('account') }}" class="mobile-link">Account</a></li>
@@ -168,7 +219,6 @@
                     @csrf
                     <button class="mobile-link w-full text-left">Logout</button>
                 </form>
-
             @endauth
 
             @guest
@@ -176,10 +226,10 @@
                 <li><a href="{{ route('register.form') }}" class="mobile-link">Register</a></li>
             @endguest
 
-            <li><a href="/cart" class="mobile-link">Cart</a></li>
         </ul>
     </div>
 </header>
+
 
 
 {{-- =========================== --}}

@@ -73,6 +73,7 @@
 
                 <div class="flex gap-4 mt-8">
 
+                    {{-- CART --}}
                     <form method="POST"
                           action="{{ route('cart.add', $product->id) }}"
                           data-cart-form="add">
@@ -82,6 +83,16 @@
                         </button>
                     </form>
 
+                    {{-- FAVORITE --}}
+                    <form method="POST"
+                          action="{{ route('favorites.add', $product->id) }}">
+                        @csrf
+                        <button class="gray-btn px-6 py-3 rounded-lg">
+                            Add to Favorites
+                        </button>
+                    </form>
+
+                    {{-- COMPARE только для ПК --}}
                     @if($isPc)
                         <form method="POST" action="{{ route('compare.add', $product->id) }}">
                             @csrf
@@ -91,6 +102,7 @@
                         </form>
                     @endif
 
+                    {{-- BACK --}}
                     <a href="{{ route('catalog.index') }}"
                        class="gray-btn px-6 py-3 rounded-lg">
                         Back to Catalog

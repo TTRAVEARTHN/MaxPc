@@ -43,25 +43,19 @@
                         Details
                     </a>
 
-                    {{-- только для ПК --}}
-                    @if($isPc)
-                        <form method="POST" action="{{ route('compare.add', $product->id) }}">
-                            @csrf
-                            <button type="submit" class="gray-btn px-3 py-1 text-sm">
-                                Compare
-                            </button>
-                        </form>
-                    @endif
-
+                    {{-- FAVORITE --}}
                     <form method="POST"
-                          action="{{ route('cart.add', $product->id) }}"
-                          data-cart-form="add">
+                          action="{{ route('favorites.add', $product->id) }}">
                         @csrf
-                        <button
-                            type="button"
-                            class="cart-btn"
-                            data-cart-add="1"
-                        >
+                        <button class="gray-btn px-3 py-2 rounded text-sm">
+                            Favorite
+                        </button>
+                    </form>
+
+                    {{-- CART --}}
+                    <form method="POST" action="{{ route('cart.add', $product->id) }}">
+                        @csrf
+                        <button class="cart-btn">
                             Add to Cart
                         </button>
                     </form>
