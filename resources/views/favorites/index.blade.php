@@ -13,13 +13,15 @@
         @if($favorites->isEmpty())
             <p class="text-gray-400">You have no favorite products yet.</p>
         @else
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {{-- ОБЁРТКА, с которой работают скрипты (favoritesAjax.ts) --}}
+            <div id="favoritesWrapper" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
                 @foreach($favorites as $fav)
                     @php($product = $fav->product)
                     @if(!$product) @continue @endif
 
-                    <div class="product-card">
+                    {{-- добавил favorite-item, чтобы favoritesAfterActions.ts мог удалить карточку --}}
+                    <div class="product-card favorite-item">
 
                         <a href="{{ route('product.show', $product) }}">
                             <img src="{{ $product->main_image
@@ -41,8 +43,10 @@
                                     Details
                                 </a>
 
+                                {{-- ВАЖНО: data-favorite-form="remove" --}}
                                 <form method="POST"
-                                      action="{{ route('favorites.remove', $product->id) }}">
+                                      action="{{ route('favorites.remove', $product->id) }}"
+                                      data-favorite-form="remove">
                                     @csrf
                                     @method('DELETE')
                                     <button class="gray-btn px-3 py-2 rounded text-sm">
@@ -61,4 +65,3 @@
     </div>
 
 @endsection
-

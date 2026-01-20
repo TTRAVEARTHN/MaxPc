@@ -49,28 +49,17 @@
         </div>
 
         @php
-            use App\Models\Cart;
-            use App\Models\Favorite;
-
-            // compare из сессии
-            $compareIds   = session('compare', []);
+            $compareIds = session('compare', []);
             $compareCount = is_array($compareIds) ? count($compareIds) : 0;
 
-            $cartCount      = 0;
-            $favoritesCount = 0;
+            $cart = auth()->check()
+                ? \App\Models\Cart::with('items')->where('user_id', auth()->id())->first()
+                : null;
+            $cartCount = $cart ? $cart->items->sum('quantity') : 0;
 
-            if (auth()->check()) {
-                $user = auth()->user();
-
-                // корзина
-                $cart = Cart::with('items')->where('user_id', $user->id)->first();
-                if ($cart) {
-                    $cartCount = $cart->items->sum('quantity');
-                }
-
-                // избранное
-                $favoritesCount = Favorite::where('user_id', $user->id)->count();
-            }
+            $favoritesCount = auth()->check()
+                ? \App\Models\Favorite::where('user_id', auth()->id())->count()
+                : 0;
         @endphp
 
         {{-- RIGHT SIDE (desktop only) --}}
@@ -81,8 +70,8 @@
                 Favorites
                 <span id="favoritesCount"
                       class="ml-1 px-2 py-0.5 text-xs rounded bg-blue-500
-                             {{ $favoritesCount > 0 ? '' : 'hidden' }}">
-                    {{ $favoritesCount }}
+                 {{ $favoritesCount > 0 ? '' : 'hidden' }}">
+                     {{ $favoritesCount }}
                 </span>
             </a>
 

@@ -14,6 +14,8 @@ import "./cart/cartCounter";
 import "./cart/cartAfterActions";
 import "./compare/compareCounter"
 import "./compare/compareAjax"
+import "./favorites/favoritesAjax";
+
 
 // only mount App.vue if there's a #app element in the page
 if (document.getElementById('app')) {

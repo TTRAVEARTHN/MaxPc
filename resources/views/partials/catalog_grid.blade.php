@@ -45,7 +45,8 @@
 
                     {{-- FAVORITE --}}
                     <form method="POST"
-                          action="{{ route('favorites.add', $product->id) }}">
+                          action="{{ route('favorites.add', $product->id) }}"
+                          data-favorite-form="add">
                         @csrf
                         <button class="gray-btn px-3 py-2 rounded text-sm">
                             Favorite
@@ -53,7 +54,9 @@
                     </form>
 
                     {{-- CART --}}
-                    <form method="POST" action="{{ route('cart.add', $product->id) }}">
+                    <form method="POST"
+                          action="{{ route('cart.add', $product->id) }}"
+                          data-cart-form="add">
                         @csrf
                         <button class="cart-btn">
                             Add to Cart

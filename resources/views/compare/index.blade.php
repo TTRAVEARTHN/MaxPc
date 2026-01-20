@@ -1,6 +1,5 @@
 @extends('layouts.app')
 
-
 @section('content')
 
     <div class="page-container">
@@ -24,8 +23,10 @@
         @else
 
             {{-- очистить весь список --}}
-            <form method="POST" action="{{ route('compare.clear') }}" class="mb-4"
-                data-compare-form="clear">
+            <form method="POST"
+                  action="{{ route('compare.clear') }}"
+                  class="mb-4"
+                  data-compare-form="clear">
                 @csrf
                 @method('DELETE')
                 <button class="gray-btn px-4 py-2">
@@ -33,86 +34,92 @@
                 </button>
             </form>
 
+            @php
+                $allSpecs = [];
+                foreach ($products as $p) {
+                    if (is_array($p->specs)) {
+                        $allSpecs = array_unique(array_merge($allSpecs, array_keys($p->specs)));
+                    }
+                }
+            @endphp
 
-            {{-- 🔹 контейнер с горизонтальным скроллом --}}
+            {{-- контейнер с горизонтальным скроллом --}}
             <div class="card-box overflow-x-auto">
 
-                @php
-                    $allSpecs = [];
-                    foreach ($products as $p) {
-                        if (is_array($p->specs)) {
-                            $allSpecs = array_unique(array_merge($allSpecs, array_keys($p->specs)));
-                        }
-                    }
-                @endphp
+                <div id="compareWrapper" class="card-box overflow-x-auto">
 
-                <table class="table min-w-[900px]">
-                    <thead>
-                    <tr>
-                        <th class="min-w-[160px]">Feature</th>
+                    <table class="table min-w-[900px]">
+                        <thead>
+                        <tr>
+                            {{-- левая колонка с названиями характеристик --}}
+                            <th class="min-w-[160px]">Feature</th>
 
-                        @foreach($products as $p)
-                            <th class="align-top min-w-[220px]">
+                            {{-- по одному столбцу на каждый товар --}}
+                            @foreach($products as $p)
+                                <th class="min-w-[220px] align-top"
+                                    data-compare-product-id="{{ $p->id }}">
+                                    <div class="flex items-start justify-between gap-2">
 
-                                <div class="flex items-start justify-between gap-2">
-                                    <div>
-                                        <div class="font-semibold">
+                                        {{-- ссылка на товар --}}
+                                        <a href="{{ route('product.show', $p) }}"
+                                           class="font-semibold hover:text-blue-400">
                                             {{ $p->name }}
-                                        </div>
-                                        <div class="text-gray-400 text-sm">
-                                            {{ $p->category->name ?? '—' }}
-                                        </div>
-                                        <div class="font-bold mt-1">
-                                            ${{ number_format($p->price, 2) }}
-                                        </div>
+                                        </a>
+
+                                        {{-- кнопка удаления ТОЛЬКО этого товара --}}
+                                        <form method="POST"
+                                              action="{{ route('compare.remove', $p->id) }}"
+                                              data-compare-form="remove"
+                                              data-product-id="{{ $p->id }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="gray-btn px-2 py-1 text-xs">
+                                                Remove
+                                            </button>
+                                        </form>
                                     </div>
 
-                                    <form method="POST"
-                                          action="{{ route('compare.remove', $p->id) }}"
-                                          data-compare-form="remove">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="gray-btn px-3 py-1 text-sm">Remove</button>
-                                    </form>
+                                    <p class="text-gray-400 text-sm mt-1">
+                                        ${{ number_format($p->price, 2) }}
+                                    </p>
+                                </th>
+                            @endforeach
+                        </tr>
+                        </thead>
 
-                                </div>
+                        <tbody>
+                        {{-- строки с характеристиками --}}
+                        @foreach($allSpecs as $specKey)
+                            <tr>
+                                <td class="font-semibold uppercase text-gray-300">
+                                    {{ $specKey }}
+                                </td>
 
-                            </th>
+                                @foreach($products as $p)
+                                    <td data-compare-product-id="{{ $p->id }}">
+                                        {{ is_array($p->specs) ? ($p->specs[$specKey] ?? '—') : '—' }}
+                                    </td>
+                                @endforeach
+                            </tr>
                         @endforeach
-                    </tr>
-                    </thead>
 
-                    <tbody>
-
-                    {{-- характеристики --}}
-                    @foreach($allSpecs as $specKey)
+                        {{-- описание --}}
                         <tr>
-                            <td class="font-semibold uppercase text-gray-300">
-                                {{ $specKey }}
-                            </td>
+                            <td class="font-semibold text-gray-300">Description</td>
                             @foreach($products as $p)
-                                <td>
-                                    {{ is_array($p->specs) ? ($p->specs[$specKey] ?? '—') : '—' }}
+                                <td class="text-gray-400"
+                                    data-compare-product-id="{{ $p->id }}">
+                                    {{ $p->description ?? '—' }}
                                 </td>
                             @endforeach
                         </tr>
-                    @endforeach
 
-                    {{-- описание --}}
-                    <tr>
-                        <td class="font-semibold text-gray-300">Description</td>
-                        @foreach($products as $p)
-                            <td class="text-gray-400">
-                                {{ $p->description ?? '—' }}
-                            </td>
-                        @endforeach
-                    </tr>
+                        </tbody>
+                    </table>
 
-                    </tbody>
-                </table>
+                </div>
 
             </div>
-
         @endif
 
     </div>
