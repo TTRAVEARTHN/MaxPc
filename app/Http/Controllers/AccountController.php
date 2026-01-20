@@ -11,7 +11,14 @@ class AccountController extends Controller
     public function index()
     {
         $user = Auth::user();
-        return view('account', compact('user'));
+
+        // Подтягиваем заказы пользователя вместе с товарами
+        $orders = $user->orders()
+            ->with('items.product')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('account', compact('user', 'orders'));
     }
 
     public function update(Request $request)
