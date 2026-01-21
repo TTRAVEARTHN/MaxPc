@@ -42,6 +42,9 @@ class AdminProductController extends Controller
         return view('admin.products.create', compact('categories'));
     }
 
+    /**
+     * Tento kod bol vytvoreny s pomocou AI.
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -95,7 +98,7 @@ class AdminProductController extends Controller
     }
 
     /**
-     * Update product
+     * Tento kod bol vytvoreny s pomocou AI.
      */
     public function update(Request $request, Product $product)
     {

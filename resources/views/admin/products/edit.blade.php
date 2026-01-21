@@ -161,6 +161,11 @@
 
 @endsection
 
+{{--
+/**
+ * Tento kod bol vytvoreny s pomocou AI.
+ */
+--}}
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {

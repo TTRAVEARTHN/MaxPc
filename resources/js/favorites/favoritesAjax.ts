@@ -53,6 +53,7 @@ export function initFavoriteForms(root: ParentNode = document): void {
             const realMethod = spoofMethod ? 'POST' : (form.method || 'POST');
             const actionType = form.dataset.favoriteForm; // "add" | "remove"
 
+            //Tento kod bol vytvoreny s pomocou AI
             fetch(form.action, {
                 method: realMethod.toUpperCase(),
                 headers: {

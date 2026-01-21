@@ -94,6 +94,7 @@ export function initCartForms(root: ParentNode = document): void {
 
             // AJAX request
 
+            //Tento kod bol vytvoreny s pomocou AI
             fetch(form.action, {
                 method: realMethod.toUpperCase(),
                 headers: {

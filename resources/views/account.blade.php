@@ -68,6 +68,9 @@
         {{-- ========================= --}}
         {{-- MY ORDERS --}}
         {{-- ========================= --}}
+
+{{--        Tento kod bol vytvoreny s pomocou AI.--}}
+
         <div class="panel mt-8">
             <h2 class="panel-title mb-4">My Orders</h2>
 

@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!loadMoreWrapper) return;
 
+
         if (data.hasMore && data.nextPageUrl) {
             loadMoreWrapper.innerHTML = `
                 <a id="loadMoreBtn"
