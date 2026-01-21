@@ -5,18 +5,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const sortSelect       = document.querySelector<HTMLSelectElement>('#sortSelect');
 
 
-    // если нужных элементов нет — выходим и вообще ничего не делаем
+    // ak chyba grid alebo citac tak nema zmysel pokracovat
     if (!catalogGridRaw || !productCountRaw) {
         return;
     }
 
 
-    // после проверки TS понимает, что это уже НЕ null
+    //vieme ze nie su null
     const catalogGrid  = catalogGridRaw;
     const productCount = productCountRaw;
 
-    // общая функция загрузки каталога по URL
+    // funkcia pre AJAX nacitanie katalogu cez URL
     function loadCatalog(url: string): void {
+        // pridame ajax=1 do query
         const apiUrl = url.includes("?") ? `${url}&ajax=1` : `${url}?ajax=1`;
 
         fetch(apiUrl, {
@@ -32,10 +33,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 return response.json();
             })
             .then((data: any) => {
+                // aktualizujeme HTML katalogu a pocet produktov
                 catalogGrid.innerHTML = data.html;
                 productCount.textContent = `${data.total} products`;
 
-                // В историю пишем красивый URL БЕЗ ajax=1
+                // do historiky zapiseme cisty URL bez ajaxu
                 window.history.pushState({}, "", url);
             })
             .catch(err => {
@@ -44,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    // klik na kategoriu cez AJAX
     if (categoryLinks.length) {
         categoryLinks.forEach(link => {
             link.addEventListener("click", (e) => {
@@ -51,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const url = link.href;
 
-                // переключаем активную категорию
+                // nastavenie aktivnej kategorie
                 categoryLinks.forEach(l => {
                     l.classList.remove("filter-btn-active");
                     l.classList.add("filter-btn");
@@ -66,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+    // zmena sortu cez AJAX
     if (sortSelect) {
         sortSelect.addEventListener("change", (e) => {
             e.preventDefault();
@@ -73,6 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const params = new URLSearchParams(window.location.search);
             const selectedSort = sortSelect.value;
 
+            // default znamena ze sort odstranime
             if (selectedSort === "default") {
                 params.delete("sort");
             } else {

@@ -9,8 +9,6 @@ import "./ui/mobileMenu";
 import "./validation/register";
 import "./validation/login";
 import "./catalog/categoryFilter";
-import "./cart/cartAjax";
-import "./cart/cartCounter";
 import "./cart/cartAfterActions";
 import "./compare/compareAjax"
 import "./favorites/favoritesAjax";

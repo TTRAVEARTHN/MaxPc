@@ -1,4 +1,5 @@
 function formatMoney(value: number): string {
+    // jednoduche formatovanie ceny na USD
     return value.toLocaleString('en-US', {
         style: 'currency',
         currency: 'USD',
@@ -7,7 +8,10 @@ function formatMoney(value: number): string {
     });
 }
 
+
+
 function recalcCartSummary() {
+    // prechadzame vsetky polozky v kosiku a rucne prepocitame sumy
     const itemEls = document.querySelectorAll<HTMLDivElement>('.cart-item');
     let subtotal = 0;
 
@@ -18,13 +22,16 @@ function recalcCartSummary() {
         subtotal += price * qty;
     });
 
+
     const tax = subtotal * 0.20;
-    const total = subtotal; // если VAT уже в цене
+    const total = subtotal; // ak je DPH uz v cene, tak total = subtotal
+
 
     const subtotalEl = document.querySelector<HTMLElement>('#cartSubtotal');
     const taxEl      = document.querySelector<HTMLElement>('#cartTax');
     const totalEl    = document.querySelector<HTMLElement>('#cartTotal');
 
+    // zapis prepocitanych hodnot do summary casti
     if (subtotalEl) subtotalEl.textContent = formatMoney(subtotal);
     if (taxEl)      taxEl.textContent      = formatMoney(tax);
     if (totalEl)    totalEl.textContent    = formatMoney(total);
@@ -32,6 +39,7 @@ function recalcCartSummary() {
 
 function syncCartBadge() {
     const cartCountEl = document.querySelector<HTMLElement>('#cartCount');
+    // ak v hlavicke nie je badge tak neriesime
     if (!cartCountEl) return;
 
     fetch('/cart/count', {
@@ -44,6 +52,8 @@ function syncCartBadge() {
         .then(res => res.json())
         .then(data => {
             const count = Number(data.count ?? 0);
+            // zobrazime badge len ked je nieco v kosiku
+
             if (count > 0) {
                 cartCountEl.textContent = String(count);
                 cartCountEl.classList.remove('hidden');
@@ -55,21 +65,30 @@ function syncCartBadge() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    // pri kazdom loade stranky zosynchronizujeme badge
+    syncCartBadge();
+
+
+
     const forms = document.querySelectorAll<HTMLFormElement>('form[data-cart-form]');
+    // ak na stranke nie su ziadne cart formy tak dalej neviazeme handlery
     if (!forms.length) return;
 
     const csrfMeta = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]');
+
     const csrfToken = csrfMeta ? csrfMeta.content : '';
 
     forms.forEach(form => {
         form.addEventListener("submit", (e) => {
+
             e.preventDefault();
 
             const formData = new FormData(form);
             const spoofMethod = (form.querySelector('input[name="_method"]') as HTMLInputElement | null)?.value;
             const realMethod = spoofMethod ? 'POST' : (form.method || 'POST');
-            const actionType = form.dataset.cartForm; // "update" или "remove"
+            const actionType = form.dataset.cartForm; // "add" | "update" | "remove"
 
+            // AJAX request namiesto klasickeho submitu
             fetch(form.action, {
                 method: realMethod.toUpperCase(),
                 headers: {
@@ -86,20 +105,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(() => {
                     const cartItemEl = form.closest<HTMLDivElement>('.cart-item');
 
-                    //  обновление количества
+                    // update mnozstva polozky
                     if (actionType === 'update' && cartItemEl) {
                         const newQty = Number(
                             (form.querySelector('input[name="quantity"]') as HTMLInputElement).value
                         );
 
-                        // 1) показываем новое кол-во пользователю
+                        // zobrazime nove mnozstvo pri polozke
                         const qtyDisplay = cartItemEl.querySelector<HTMLElement>('.cart-qty-display');
                         if (qtyDisplay) {
                             qtyDisplay.textContent = String(newQty);
                         }
 
-                        // 2) обновляем hidden-инпуты в формах +/-,
-                        //    чтобы следующий клик отправлял правильное значение
+                        // aktualizujeme hidden inputy v + a - formach
                         const updateForms = cartItemEl.querySelectorAll<HTMLFormElement>('form[data-cart-form="update"]');
 
                         if (updateForms.length === 2) {
@@ -118,14 +136,16 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     }
 
-                    // удаление товара
+                    // odstranenie polozky z kosika
                     if (actionType === 'remove' && cartItemEl) {
                         cartItemEl.remove();
                     }
-                    //  если корзина опустела — показать сообщение
+
+                    // ak po operacii nezostali ziadne polozky -> zobrazime hlasku o prazdnom kosiku
                     const itemsWrapper = document.querySelector<HTMLDivElement>('#cartItemsWrapper');
                     const remainingItems = itemsWrapper?.querySelectorAll('.cart-item') ?? [];
                     const emptyMsg = document.querySelector<HTMLElement>('#emptyCartMessage');
+
 
                     if (remainingItems.length === 0) {
                         if (emptyMsg) {
@@ -139,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     }
 
-                    // пересчёт сумм и бейджа
+                    // po akcii prepocitame summary a badge v hlavicke
                     recalcCartSummary();
                     syncCartBadge();
                 })
@@ -148,4 +168,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
         });
     });
+
+});
+
+// ked sa vratime naspat (bfcache), tak si dotiahneme aktualny pocet z backendu
+window.addEventListener("pageshow", (event) => {
+    if (event.persisted) {
+        syncCartBadge();
+    }
 });
