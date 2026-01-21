@@ -221,10 +221,24 @@
 
 
 
-{{-- =========================== --}}
-{{-- MAIN CONTENT --}}
-{{-- =========================== --}}
+
+
 <main>
+    @if(session('success') || session('error'))
+        <div class="fixed inset-x-0 top-16 z-[60] flex justify-center">
+            @if(session('success'))
+                <div class="flash flash-success" data-flash>
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="flash flash-error" data-flash>
+                    {{ session('error') }}
+                </div>
+            @endif
+        </div>
+    @endif
     @yield('content')
 </main>
 
@@ -275,6 +289,7 @@
         © 2025 MaxPc. All rights reserved.
     </p>
 </footer>
+
 
 @stack('scripts')
 </body>

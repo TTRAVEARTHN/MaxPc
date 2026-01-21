@@ -20,6 +20,8 @@ Route::get('/', function () {
 
 
 
+
+
 // CONTACT
 Route::get('/contact', [ContactController::class, 'show'])
     ->name('contact');
@@ -27,6 +29,15 @@ Route::get('/contact', [ContactController::class, 'show'])
 Route::post('/contact', [ContactController::class, 'send'])
     ->name('contact.send');
 
+Route::middleware('auth')->group(function () {
+    // страница с обзором заказа
+    Route::get('/checkout', [OrderController::class, 'checkout'])
+        ->name('checkout');
+
+    // сабмит кнопки Place Order
+    Route::post('/checkout', [OrderController::class, 'placeOrder'])
+        ->name('checkout.place');
+});
 
 // Account area
 Route::middleware('auth')->group(function () {
@@ -64,9 +75,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     })->name('admin.dashboard');
 });
 
-/* =========================
-   ADMIN PANEL
-   ========================= */
+
 Route::middleware(['auth', 'admin'])->group(function () {
 
     // USERS
@@ -141,7 +150,7 @@ Route::delete('/cart/remove/{item}', [CartController::class, 'remove'])->name('c
 
 Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
-Route::post('/checkout', [CheckoutController::class, 'process'])->name('checkout');
+//Route::post('/checkout', [CheckoutController::class, 'process'])->name('checkout');
 
 // COMPARE
 Route::get('/compare', [CompareController::class, 'index'])->name('compare.index');
@@ -150,8 +159,11 @@ Route::delete('/compare/remove/{product}', [CompareController::class, 'remove'])
 Route::delete('/compare/clear', [CompareController::class, 'clear'])->name('compare.clear');
 
 
-Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
-Route::post('/checkout/place', [OrderController::class, 'placeOrder'])->name('checkout.place');
+//Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
+//Route::post('/checkout/place', [OrderController::class, 'placeOrder'])->name('checkout.place');
+//Route::post('/checkout', [CheckoutController::class, 'process'])
+//    ->name('checkout.place')
+//    ->middleware('auth');
 
 Route::get('/favorites', [FavoriteController::class, 'index'])
     ->name('favorites.index');

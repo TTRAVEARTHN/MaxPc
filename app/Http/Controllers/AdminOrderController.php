@@ -9,13 +9,39 @@ class AdminOrderController extends Controller
 {
     public function index(Request $request)
     {
-        // eager loading usera a poloziek aby sa zamedzilo N+1
-        $orders = Order::with(['user', 'items.product'])
-            // eager loading usera a poloziek aby sa zamedzilo N+1
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $search = $request->query('search');
 
-        return view('admin.orders.orders', compact('orders'));
+        $orders = Order::with(['user', 'items.product'])
+            ->when($search, function ($q) use ($search) {
+
+                $q->where(function ($inner) use ($search) {
+
+
+                    if (is_numeric($search)) {
+                        $inner->where('id', (int)$search);
+                    }
+
+
+                    $inner->orWhereHas('user', function ($uq) use ($search) {
+                        $uq->where('name', 'LIKE', "%{$search}%")
+                            ->orWhere('email', 'LIKE', "%{$search}%");
+                    });
+
+
+                    $inner->orWhereHas('items.product', function ($pq) use ($search) {
+                        $pq->where('name', 'LIKE', "%{$search}%");
+                    });
+
+                });
+
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('admin.orders.orders', [
+            'orders' => $orders,
+            'search' => $search,
+        ]);
     }
 
     public function updateStatus(Request $request, $orderId)
@@ -38,7 +64,7 @@ class AdminOrderController extends Controller
         $order = Order::findOrFail($orderId);
         // mazeme polozky objednavky aby nezostali siroty v DB
         $order->items()->delete();
-        // mazeme samotnu objednavku
+
         $order->delete();
 
         return back()->with('success', 'Order deleted.');

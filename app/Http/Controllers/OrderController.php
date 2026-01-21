@@ -10,65 +10,85 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-
     public function checkout()
     {
         $user = Auth::user();
 
-        // user musi byt prihlaseny
         if (!$user) {
-            return redirect()->route('login.form')->with('error', 'Please, log in first.');
+            return redirect()
+                ->route('login.form')
+                ->with('error', 'Please, log in first.');
         }
 
-        // nacitanie kosika daneho usera aj s polozkami a produktmi
-        $cart = Cart::with('items.product')->where('user_id', $user->id)->first();
 
-        // redirect ak nema nic v kosiku
+        $cart = Cart::with('items.product')
+            ->where('user_id', $user->id)
+            ->first();
+
         if (!$cart || $cart->items->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
+            return redirect()
+                ->route('cart.index')
+                ->with('error', 'Your cart is empty!');
         }
 
         return view('checkout', compact('cart'));
     }
 
-
     public function placeOrder(Request $request)
     {
+
         $user = Auth::user();
 
-        // nacitame kosik aj s produktmi
-        $cart = Cart::with('items.product')->where('user_id', $user->id)->first();
-
-        if (!$cart || $cart->items->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
+        // 1) проверяем наличие адреса
+        if (!$user->address) {
+            return redirect()
+                ->route('account')   // твой роут профиля
+                ->with(
+                    'error',
+                    'Please add your shipping address in your profile before placing an order.'
+                );
         }
 
-        // vypocet celkovej sumy objednavky
+
+        // 2) загружаем корзину
+        $cart = Cart::with('items.product')
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$cart || $cart->items->isEmpty()) {
+            return redirect()
+                ->route('cart.index')
+                ->with('error', 'Your cart is empty.');
+        }
+
+        // 3) считаем сумму
         $total = 0;
         foreach ($cart->items as $item) {
             $total += $item->quantity * $item->product->price;
         }
 
-        // vytvorenie objednavky
+        // 4) создаём заказ
         $order = Order::create([
-            'user_id' => $user->id,
+            'user_id'     => $user->id,
             'total_price' => $total,
-            'status' => 'pending',
+            'status'      => 'pending',
         ]);
 
-        // vytvorenie poloziek objednavky z poloziek kosika
+        // 5) позиции заказа
         foreach ($cart->items as $item) {
             OrderItem::create([
-                'order_id'  => $order->id,
-                'product_id'=> $item->product_id,
-                'quantity'  => $item->quantity,
-                'price'     => $item->product->price,
+                'order_id'   => $order->id,
+                'product_id' => $item->product_id,
+                'quantity'   => $item->quantity,
+                'price'      => $item->product->price,
             ]);
         }
 
-        // vycistenie kosika po vytvoreni objednavky
+        // 6) чистим корзину
         $cart->items()->delete();
 
-        return redirect()->route('home')->with('success', 'Order placed successfully!');
+        return redirect()
+            ->route('home')
+            ->with('success', 'Order placed successfully!');
     }
 }

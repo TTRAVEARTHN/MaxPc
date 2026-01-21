@@ -339,6 +339,20 @@
     gap: 12px;
 }
 
+.flash {
+    @apply px-4 py-3 rounded text-sm font-medium shadow pointer-events-auto;
+}
+
+.flash-success {
+    @apply bg-green-600 text-white;
+}
+
+.flash-error {
+    @apply bg-red-600 text-white;
+}
+
+
+
 
 
 

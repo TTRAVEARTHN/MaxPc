@@ -34,9 +34,11 @@ function recalcCartSummary() {
 }
 
 function syncCartBadge() {
+
     // najdeme vsetky badge pre kosik (desktop + mobile)
     const cartCountEls = document.querySelectorAll<HTMLElement>('.js-cart-count');
     if (!cartCountEls.length) return;
+
 
     fetch('/cart/count', {
         method: 'GET',
@@ -73,6 +75,8 @@ export function initCartForms(root: ParentNode = document): void {
     const csrfMeta = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]');
     const csrfToken = csrfMeta ? csrfMeta.content : '';
 
+
+
     forms.forEach(form => {
         // ochrana aby sme na ten isty form nepridali listener viackrat
         if ((form as any)._cartHandlerAttached) {
@@ -89,6 +93,7 @@ export function initCartForms(root: ParentNode = document): void {
             const actionType = form.dataset.cartForm; // "add" | "update" | "remove"
 
             // AJAX request
+
             fetch(form.action, {
                 method: realMethod.toUpperCase(),
                 headers: {
@@ -108,6 +113,7 @@ export function initCartForms(root: ParentNode = document): void {
                     // update mnozstva polozky
                     if (actionType === 'update' && cartItemEl) {
                         const newQty = Number(
+
                             (form.querySelector('input[name="quantity"]') as HTMLInputElement).value
                         );
 
@@ -141,6 +147,8 @@ export function initCartForms(root: ParentNode = document): void {
                         cartItemEl.remove();
                     }
 
+
+
                     // ak po operacii nezostali ziadne polozky -> zobrazime hlasku o prazdnom kosiku
                     const itemsWrapper = document.querySelector<HTMLDivElement>('#cartItemsWrapper');
                     const remainingItems = itemsWrapper?.querySelectorAll('.cart-item') ?? [];
@@ -157,6 +165,7 @@ export function initCartForms(root: ParentNode = document): void {
                             itemsWrapper.appendChild(p);
                         }
                     }
+
 
                     // po akcii prepocitame summary a badge v hlavicke
                     recalcCartSummary();

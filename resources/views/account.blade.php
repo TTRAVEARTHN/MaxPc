@@ -6,12 +6,7 @@
 
         <h1 class="page-title mb-6">My Account</h1>
 
-        {{-- SUCCESS MESSAGE --}}
-        @if(session('success'))
-            <div class="alert-success mb-4">
-                {{ session('success') }}
-            </div>
-        @endif
+
 
         {{-- ========================= --}}
         {{-- PERSONAL INFORMATION --}}

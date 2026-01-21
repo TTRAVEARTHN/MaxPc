@@ -64,7 +64,7 @@ export function initFavoriteForms(root: ParentNode = document): void {
             })
                 .then(res => res.json().catch(() => ({})))
                 .then(data => {
-                    // neautorizovany user -> presmerujeme na login
+                    // neautorizovany user  presmerujeme na login
                     if (data.redirect_to_login && data.login_url) {
                         window.location.href = data.login_url;
                         return;

@@ -11,19 +11,25 @@ class AdminProductController extends Controller
 
     public function index(Request $request)
     {
-        // jednoduche fulltext vyhladavanie podla nazvu
         $search = $request->query('search');
-
         $products = Product::with('category')
             ->when($search, function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%");
+                $q->where(function($qq) use ($search) {
+                    if (is_numeric($search)) {
+                        $qq->where('id', (int)$search);
+                    }
+
+                    $qq->orWhere('name', 'LIKE', "%{$search}%");
+
+                    $qq->orWhereHas('category', function($cq) use ($search) {
+                        $cq->where('name', 'LIKE', "%{$search}%");
+                    });
+                });
             })
             ->orderBy('created_at', 'desc')
-            // strankovanie po 20 kuskov
             ->paginate(5)
             ->withQueryString();
 
-        // posielame produkty a aktualny search text do admin view
         return view('admin.products.products', compact('products', 'search'));
     }
 

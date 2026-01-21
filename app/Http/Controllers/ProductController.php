@@ -11,17 +11,15 @@ class ProductController extends Controller
     // hlavna stranka katalogu pre uzivatelov
     public function index(Request $request)
     {
-        // pripraveny query builder s loadingom kategorie
         $query = Product::with('category');
 
-        if ($request->has('category') && $request->category !== null) {
-            // filtrovanie produktov podla zvolenej kategorie
-            $query->where('category_id', $request->category);
+        // фильтр по категории
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->integer('category'));
         }
 
-
-        // triedenie podla parametra sort z requestu
-        switch ($request->sort) {
+        // сортировка
+        switch ($request->get('sort')) {
             case 'price_asc':
                 $query->orderBy('price', 'asc');
                 break;
@@ -35,24 +33,28 @@ class ProductController extends Controller
                 $query->orderBy('id', 'asc');
         }
 
-        // strankovanie po 12 produktov
-        $products = $query->paginate(12);
-        // zoznam vsetkych kategorii pre filter
+        // сколько товаров грузим за один раз
+        $perPage   = 6;
+        $products  = $query->paginate($perPage)->withQueryString();
         $categories = Category::all();
 
-
-        // odpoved pre AJAX nacitavanie katalogu
+        // AJAX-ответ для фильтров / сортировки / load more
         if ($request->boolean('ajax')) {
-            $html = view('partials.catalog_grid', compact('products'))->render();
+            // рендерим только карточки, без обёртки
+            $itemsHtml = view('partials.catalog_grid', compact('products'))->render();
 
             return response()->json([
-                'html' => $html,
-                'total' => $products->total(),
+                'html'        => $itemsHtml,
+                'total'       => $products->total(),
+                'from'        => $products->firstItem(),
+                'to'          => $products->lastItem(),
+                'hasMore'     => $products->hasMorePages(),
+                'nextPageUrl' => $products->nextPageUrl(),
             ]);
         }
 
+        // обычный первый рендер страницы
         return view('catalog', compact('products', 'categories'));
-
     }
 
     public function show(Product $product)

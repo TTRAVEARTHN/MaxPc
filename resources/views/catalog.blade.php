@@ -75,26 +75,32 @@
 
         </div>
 
-        {{-- =============================== --}}
-        {{-- PRODUCT GRID (AJAX-CONTAINER) --}}
-        {{-- =============================== --}}
-        <div id="catalogGrid">
+        {{-- CATALOG GRID --}}
+
+        <div id="catalogGrid"
+             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @include('partials.catalog_grid', ['products' => $products])
         </div>
 
-        {{-- =============================== --}}
-        {{-- PAGINATION / LOAD MORE (пока можно оставить как было или убрать) --}}
-        {{-- =============================== --}}
-        {{--
-        <div class="flex justify-center mt-10">
+        {{-- инфо "Showing X to Y of Z results" --}}
+        <p id="catalogInfo"
+           class="text-center text-gray-500 mt-6">
+            Showing {{ $products->firstItem() }} to {{ $products->lastItem() }}
+            of {{ $products->total() }} results
+        </p>
+
+        {{-- LOAD MORE --}}
+        <div id="loadMoreWrapper" class="flex justify-center mt-4">
             @if($products->hasMorePages())
-                <a href="{{ $products->nextPageUrl() }}"
+                <a id="loadMoreBtn"
+                   href="{{ $products->nextPageUrl() }}"
+                   data-next-url="{{ $products->nextPageUrl() }}"
                    class="load-more-btn">
-                    Load More
+                    Load more
                 </a>
             @endif
         </div>
-        --}}
+
 
     </div>
 

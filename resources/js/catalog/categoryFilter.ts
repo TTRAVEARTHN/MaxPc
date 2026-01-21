@@ -1,30 +1,31 @@
 import { initCartForms } from '../cart/cartAfterActions';
 import { initFavoriteForms } from '../favorites/favoritesAjax';
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
+    const categoryLinks = document.querySelectorAll<HTMLAnchorElement>('[data-category-link]');
 
-    const categoryLinks  = document.querySelectorAll<HTMLAnchorElement>('[data-category-link]');
-    const catalogGrid    = document.querySelector<HTMLDivElement>('#catalogGrid');
-    const productCount   = document.querySelector<HTMLElement>('#productCount');
-    const sortSelect     = document.querySelector<HTMLSelectElement>('#sortSelect');
-    const catalogInfo    = document.querySelector<HTMLElement>('#catalogInfo');
-    const loadMoreWrapper = document.querySelector<HTMLDivElement>('#loadMoreWrapper');
+    const catalogGridRaw   = document.querySelector<HTMLDivElement>('#catalogGrid');
+    const productCountRaw  = document.querySelector<HTMLElement>('#productCount');
+    const sortSelect       = document.querySelector<HTMLSelectElement>('#sortSelect');
+    const catalogInfo      = document.querySelector<HTMLElement>('#catalogInfo');
+    const loadMoreWrapper  = document.querySelector<HTMLDivElement>('#loadMoreWrapper');
 
-    // ak chyba grid alebo citac tak nema zmysel pokracovat
-    if (!catalogGrid || !productCount) {
+    // если нет грида или счетчика  дальше ничего не делаем
+    if (!catalogGridRaw || !productCountRaw) {
         return;
     }
 
-    // pomocna funkcia pre info text a load more tlacidlo
-    function updateInfoAndLoadMore(data: any): void {
+    // дальше работаем уже с не null переменными
+    const catalogGrid: HTMLDivElement = catalogGridRaw;
+    const productCount: HTMLElement   = productCountRaw;
 
+    function updateInfoAndLoadMore(data: any): void {
         if (catalogInfo) {
             catalogInfo.textContent = `Showing ${data.from} to ${data.to} of ${data.total} results`;
         }
 
         if (!loadMoreWrapper) return;
 
-        // ak su este dalsie stranky zobrazime tlacidlo
         if (data.hasMore && data.nextPageUrl) {
             loadMoreWrapper.innerHTML = `
                 <a id="loadMoreBtn"
@@ -34,60 +35,57 @@ document.addEventListener("DOMContentLoaded", () => {
                     Load more
                 </a>
             `;
-            attachLoadMore(); // naviazeme listener
+            attachLoadMore();
         } else {
-            // inak wrapper vycistime
             loadMoreWrapper.innerHTML = '';
         }
     }
 
-    // univerzalne nacitanie katalogu (pre kategoriu a sort) – nahradza obsah
     function loadCatalog(url: string): void {
-        const apiUrl = url.includes("?") ? `${url}&ajax=1` : `${url}?ajax=1`;
+        const apiUrl = url.includes('?') ? `${url}&ajax=1` : `${url}?ajax=1`;
 
         fetch(apiUrl, {
-            method: "GET",
+            method: 'GET',
             headers: {
-                "Accept": "application/json",
+                Accept: 'application/json',
             },
         })
             .then((response: Response) => {
                 if (!response.ok) {
-                    throw new Error("Network response was not ok");
+                    throw new Error('Network response was not ok');
                 }
                 return response.json();
             })
             .then((data: any) => {
-                // nahradime vsetky kartu v gride
+                // заменяем карты товаров
                 catalogGrid.innerHTML = data.html;
                 productCount.textContent = `${data.total} products`;
 
-                // po vymene HTML znova naviazeme AJAX na cart a favorites
+                // перевешиваем AJAX-обработчики
                 initCartForms(catalogGrid);
                 initFavoriteForms(catalogGrid);
 
-                // prepiseme info text a load more
+                // обновляем текст и кнопку Load more
                 updateInfoAndLoadMore(data);
 
-                // do historie zapiseme cisty URL bez ajax=1
-                window.history.pushState({}, "", url);
+                // в историю пишем URL без ajax=1
+                window.history.pushState({}, '', url);
             })
             .catch(err => {
-                console.error("Catalog AJAX error:", err);
+                console.error('Catalog AJAX error:', err);
             });
     }
 
-    // load more – prida dalsiu stranku na koniec
     function attachLoadMore(): void {
         if (!loadMoreWrapper) return;
 
         const btn = loadMoreWrapper.querySelector<HTMLAnchorElement>('#loadMoreBtn');
         if (!btn) return;
 
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', e => {
             e.preventDefault();
 
-            // ochrana proti dvojkliku
+            // защита от двойного клика
             if (btn.dataset.loading === '1') return;
             btn.dataset.loading = '1';
 
@@ -99,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
             fetch(apiUrl, {
                 method: 'GET',
                 headers: {
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                 },
             })
                 .then(res => {
@@ -107,26 +105,24 @@ document.addEventListener("DOMContentLoaded", () => {
                     return res.json();
                 })
                 .then((data: any) => {
-                    // pridame nove karty za existujuce
+                    // добавляем новые карточки в конец
                     catalogGrid.insertAdjacentHTML('beforeend', data.html);
 
-                    // aktualizujeme text s rozsahom
                     if (catalogInfo) {
-                        catalogInfo.textContent =
-                            `Showing ${data.from} to ${data.to} of ${data.total} results`;
+                        catalogInfo.textContent = `Showing ${data.from} to ${data.to} of ${data.total} results`;
                     }
 
-                    // znova naviazeme AJAX na nove formy
+
                     initCartForms(catalogGrid);
                     initFavoriteForms(catalogGrid);
 
-                    // ak su este dalsie stranky, len posunieme next-url
+
                     if (data.hasMore && data.nextPageUrl) {
                         btn.dataset.nextUrl = data.nextPageUrl;
                         btn.setAttribute('href', data.nextPageUrl);
                         btn.dataset.loading = '0';
                     } else {
-                        // ak nie, tlacidlo skryjeme
+
                         loadMoreWrapper.innerHTML = '';
                     }
                 })
@@ -136,57 +132,60 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // klik na kategoriu cez AJAX
+
+
     if (categoryLinks.length) {
         categoryLinks.forEach(link => {
-            link.addEventListener("click", (e) => {
+            link.addEventListener('click', e => {
                 e.preventDefault();
 
                 const url = link.href;
 
-                // nastavenie aktivnej kategorie
+                // активная кнопка категории
                 categoryLinks.forEach(l => {
-                    l.classList.remove("filter-btn-active");
-                    l.classList.add("filter-btn");
+                    l.classList.remove('filter-btn-active');
+                    l.classList.add('filter-btn');
                 });
+                link.classList.remove('filter-btn');
+                link.classList.add('filter-btn-active');
 
-                link.classList.remove("filter-btn");
-                link.classList.add("filter-btn-active");
-
-                // pri zmene kategorie ideme na prvu stranu (bez page parametra)
-                const cleanUrl = url.replace(/([?&])page=\d+/i, '$1').replace(/[?&]$/, '');
+                // при смене категории всегда на первую страницу
+                const cleanUrl = url
+                    .replace(/([?&])page=\d+/i, '$1')
+                    .replace(/[?&]$/, '');
 
                 loadCatalog(cleanUrl);
             });
         });
     }
 
-    // zmena sortu cez AJAX
+
+
     if (sortSelect) {
-        sortSelect.addEventListener("change", (e) => {
+        sortSelect.addEventListener('change', e => {
             e.preventDefault();
 
             const params = new URLSearchParams(window.location.search);
             const selectedSort = sortSelect.value;
 
-            // default znamena ze sort odstranime
-            if (selectedSort === "default") {
-                params.delete("sort");
+            if (selectedSort === 'default') {
+                params.delete('sort');
             } else {
-                params.set("sort", selectedSort);
+                params.set('sort', selectedSort);
             }
 
-            // pri sortovani tiez ideme na prvu stranu
+            // при смене сортировки тоже сбрасываем page
             params.delete('page');
 
-            const baseUrl = "/catalog";
-            const query   = params.toString();
-            const url     = query ? `${baseUrl}?${query}` : baseUrl;
+            const baseUrl = '/catalog';
+            const query = params.toString();
+            const url = query ? `${baseUrl}?${query}` : baseUrl;
 
             loadCatalog(url);
         });
     }
 
-    // naviazeme load more aj po prvom nacitani stranky
+
+    // привязываем load more при первом рендере
     attachLoadMore();
 });
