@@ -13,6 +13,9 @@ class ContactController extends Controller
         return view('contact');
     }
 
+    /**
+     * Tento kod bol vytvoreny s pomocou AI.
+     */
     public function send(Request $request)
     {
 
@@ -25,7 +28,7 @@ class ContactController extends Controller
 
         $toEmail = 'maxpc1685@gmail.com';
 
-        // Простейшая отправка без отдельного email-шаблона
+
         Mail::raw(
             "New contact message from MaxPC:\n\n"
             . "Name: {$data['name']}\n"
