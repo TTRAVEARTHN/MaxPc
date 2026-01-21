@@ -4,18 +4,40 @@
 
     <div class="page-container">
 
-        <h1 class="page-title">Products</h1>
+        {{-- HEADER + search + add product --}}
+        <div class="mb-6">
+            <h1 class="page-title mb-4">Products</h1>
 
-        {{-- ADD BUTTON --}}
-        <a href="{{ route('admin.products.create') }}"
-           class="blue-btn inline-block mb-6">
-            + Add Product
-        </a>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 
-        {{-- TABLE --}}
-        <div class="card-box">
+                {{-- SEARCH FORM --}}
+                <form method="GET"
+                      action="{{ route('admin.products') }}"
+                      class="flex w-full sm:w-auto gap-2">
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ $search ?? request('search') }}"
+                        placeholder="Search by name..."
+                        class="input flex-1 min-w-0"
+                    >
+                    <button class="gray-btn px-4 py-2 whitespace-nowrap">
+                        Search
+                    </button>
+                </form>
 
-            <table class="table">
+                {{-- ADD BUTTON --}}
+                <a href="{{ route('admin.products.create') }}"
+                   class="blue-btn px-4 py-2 inline-flex justify-center w-full sm:w-auto">
+                    + Add Product
+                </a>
+            </div>
+        </div>
+
+        {{-- TABLE WRAPPER --}}
+        <div class="card-box overflow-x-auto">
+
+            <table class="table min-w-[700px]">
                 <thead>
                 <tr>
                     <th style="width: 50px;">ID</th>
@@ -27,9 +49,8 @@
                 </thead>
 
                 <tbody>
-                @foreach($products as $p)
+                @forelse($products as $p)
                     <tr>
-
                         {{-- ID --}}
                         <td>{{ $p->id }}</td>
 
@@ -50,7 +71,6 @@
 
                         {{-- ACTIONS --}}
                         <td class="flex gap-3">
-
                             {{-- EDIT --}}
                             <a href="{{ route('admin.products.edit', $p->id) }}"
                                class="text-blue-400 hover:text-blue-500">
@@ -61,7 +81,6 @@
                             <form action="{{ route('admin.products.delete', $p->id) }}"
                                   method="POST"
                                   onsubmit="return confirm('Delete this product?');">
-
                                 @csrf
                                 @method('DELETE')
 
@@ -69,14 +88,23 @@
                                     Delete
                                 </button>
                             </form>
-
                         </td>
-
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="5" class="text-center text-gray-400 py-4">
+                            No products found.
+                        </td>
+                    </tr>
+                @endforelse
                 </tbody>
 
             </table>
+
+            {{-- PAGINATION --}}
+            <div class="mt-4">
+                {{ $products->links() }}
+            </div>
 
         </div>
 

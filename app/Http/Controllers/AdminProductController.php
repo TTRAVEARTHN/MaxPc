@@ -16,14 +16,15 @@ class AdminProductController extends Controller
 
         $products = Product::with('category')
             ->when($search, function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%$search%");
+                $q->where('name', 'LIKE', "%{$search}%");
             })
             ->orderBy('created_at', 'desc')
             // strankovanie po 20 kuskov
-            ->paginate(20);
+            ->paginate(5)
+            ->withQueryString();
 
-        // posielame produkty do admin view
-        return view('admin.products.products', compact('products'));
+        // posielame produkty a aktualny search text do admin view
+        return view('admin.products.products', compact('products', 'search'));
     }
 
 
