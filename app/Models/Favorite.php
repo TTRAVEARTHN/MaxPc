@@ -6,18 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Favorite extends Model
 {
-    // Mass assignable
+
     protected $fillable = [
         'user_id',
         'product_id',
     ];
 
-    // Relations
+    // vztah na usera
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    // vztah na produkt
     public function product()
     {
         return $this->belongsTo(Product::class);

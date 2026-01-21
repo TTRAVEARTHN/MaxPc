@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductImage extends Model
 {
-    // Mass assignable
+
     protected $fillable = [
         'product_id',
         'image_path',

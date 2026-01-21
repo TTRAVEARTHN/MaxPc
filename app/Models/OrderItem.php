@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrderItem extends Model
 {
-    // Mass assignable
+
     protected $fillable = [
         'order_id',
         'product_id',
@@ -14,7 +14,7 @@ class OrderItem extends Model
         'price',
     ];
 
-    // Casts
+    // pretypovanie hodnot na spravne datove typy
     protected $casts = [
         'quantity' => 'integer',
         'price' => 'decimal:2',
@@ -22,12 +22,13 @@ class OrderItem extends Model
         'updated_at' => 'datetime',
     ];
 
-    // Relations
+    // vztah na objednavku
     public function order()
     {
         return $this->belongsTo(Order::class);
     }
 
+    // vztah na produkt
     public function product()
     {
         return $this->belongsTo(Product::class);

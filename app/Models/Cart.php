@@ -6,17 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cart extends Model
 {
-    // Allow mass assignment
+    // povolene mass assignment polia
     protected $fillable = [
         'user_id',
     ];
 
-    // Relations
+    // vztah na usera
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    // vztah na polozky kosika
     public function items()
     {
         return $this->hasMany(CartItem::class);

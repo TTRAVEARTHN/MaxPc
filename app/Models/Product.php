@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    // Allow mass assignment for the fields we insert
+
     protected $fillable = [
         'category_id',
         'name',
@@ -16,7 +16,7 @@ class Product extends Model
         'main_image',
     ];
 
-    // Cast specs to array so Eloquent will json_encode/json_decode automatically
+    // automaticke pretypovanie (JSON, decimal, datetime)
     protected $casts = [
         'specs' => 'array',
         'price' => 'decimal:2',
@@ -24,27 +24,30 @@ class Product extends Model
         'updated_at' => 'datetime',
     ];
 
-    // Relations
+    // vztah na kategoriu
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function images()
-    {
-        return $this->hasMany(ProductImage::class);
-    }
+//    public function images()
+//    {
+//        return $this->hasMany(ProductImage::class);
+//    }
 
+    // vztah na oblubene polozky
     public function favorites()
     {
         return $this->hasMany(Favorite::class);
     }
 
+    // vztah na kosikove polozky
     public function cartItems()
     {
         return $this->hasMany(CartItem::class);
     }
 
+    // vztah na polozky objednavky
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);

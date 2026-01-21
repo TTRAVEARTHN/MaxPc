@@ -19,11 +19,13 @@ class User extends Authenticatable
         'role',
     ];
 
+    // schovane polia pri serializacii
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
+    // pretypovanie poli (vratane hashed password)
     protected function casts(): array
     {
         return [
@@ -32,16 +34,19 @@ class User extends Authenticatable
         ];
     }
 
+    // vztah na kosik
     public function cart()
     {
         return $this->hasOne(Cart::class);
     }
 
+    // vztah na objednavky
     public function orders()
     {
         return $this->hasMany(Order::class);
     }
 
+    // vztah na oblubene produkty
     public function favorites()
     {
         return $this->hasMany(Favorite::class);

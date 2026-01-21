@@ -6,24 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class CartItem extends Model
 {
-    // Mass assignable
     protected $fillable = [
         'cart_id',
         'product_id',
         'quantity',
     ];
 
-    // Casts
+    // pretypovanie quantity na integer pri nacitani
     protected $casts = [
         'quantity' => 'integer',
     ];
 
-    // Relations
+    // vztah na kosik
     public function cart()
     {
         return $this->belongsTo(Cart::class);
     }
 
+    // vztah na produkt
     public function product()
     {
         return $this->belongsTo(Product::class);

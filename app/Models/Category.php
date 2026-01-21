@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    // Mass assignable
+
     protected $fillable = [
         'name',
         'description',
     ];
 
-    // Relations
+    // vztah kategoria ma viac produktov
     public function products()
     {
         return $this->hasMany(Product::class);
