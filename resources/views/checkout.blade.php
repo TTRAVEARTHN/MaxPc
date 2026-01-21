@@ -2,9 +2,9 @@
 
 @section('content')
 
-    <div class="max-w-4xl mx-auto text-white py-10 px-4">
+    <div class="page-container checkout-page">
 
-        <h1 class="text-3xl font-semibold mb-6">Checkout</h1>
+        <h1 class="page-title mb-6">Checkout</h1>
 
         {{-- ORDER SUMMARY --}}
         <div class="checkout-box mb-6">
@@ -61,7 +61,7 @@
         {{-- PLACE ORDER BUTTON --}}
         <form method="POST" action="{{ route('checkout.place') }}">
             @csrf
-            <button class="checkout-btn-action @if(!$user->address) opacity-60 cursor-not-allowed @endif"
+            <button class="checkout-btn-action @if(!$user->address) checkout-btn-disabled @endif"
                     @if(!$user->address) disabled @endif>
                 Place Order
             </button>

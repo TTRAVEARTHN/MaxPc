@@ -2,11 +2,9 @@
 
 @section('content')
 
-    <div class="max-w-3xl mx-auto py-10 text-white px-6">
+    <div class="page-container account-page">
 
         <h1 class="page-title mb-6">My Account</h1>
-
-
 
         {{-- ========================= --}}
         {{-- PERSONAL INFORMATION --}}
@@ -78,41 +76,41 @@
                     You don't have any orders yet.
                 </p>
             @else
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead class="border-b border-gray-700 text-gray-400">
+                <div class="account-orders-wrapper">
+                    <table class="table account-orders-table">
+                        <thead>
                         <tr>
-                            <th class="py-2 text-left">#</th>
-                            <th class="py-2 text-left">Date</th>
-                            <th class="py-2 text-left">Items</th>
-                            <th class="py-2 text-left">Total</th>
-                            <th class="py-2 text-left">Status</th>
+                            <th>#</th>
+                            <th>Date</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Status</th>
                         </tr>
                         </thead>
 
                         <tbody>
                         @foreach($orders as $order)
-                            <tr class="border-b border-gray-800">
-                                <td class="py-2 pr-3">
+                            <tr>
+                                <td>
                                     {{ $order->id }}
                                 </td>
 
-                                <td class="py-2 pr-3">
+                                <td>
                                     {{ $order->created_at->format('Y-m-d') }}
                                 </td>
 
-                                <td class="py-2 pr-3 text-gray-300">
+                                <td class="text-gray-300">
                                     @php
                                         $itemsCount = $order->items->sum('quantity');
                                     @endphp
                                     {{ $itemsCount }} item{{ $itemsCount !== 1 ? 's' : '' }}
                                 </td>
 
-                                <td class="py-2 pr-3">
+                                <td>
                                     ${{ number_format($order->total_price, 2) }}
                                 </td>
 
-                                <td class="py-2">
+                                <td>
                                     @php $status = $order->status; @endphp
                                     <span class="
                                 inline-block px-2 py-1 rounded text-xs

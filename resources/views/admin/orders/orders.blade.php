@@ -33,9 +33,9 @@
             <p class="text-gray-400">No orders found.</p>
         @else
 
-            <div class="card-box overflow-x-auto">
+            <div class="card-box orders-table-wrapper">
 
-                <table class="table min-w-[800px]">
+                <table class="table orders-table">
                     <thead>
                     <tr>
                         <th>Order #</th>
@@ -44,7 +44,7 @@
                         <th>Total</th>
                         <th>Status</th>
                         <th>Date</th>
-                        <th style="width: 90px;">Actions</th>
+                        <th class="table-actions-col">Actions</th>
                     </tr>
                     </thead>
 
@@ -103,7 +103,7 @@
                                     @csrf
                                     @method('DELETE')
 
-                                    <button class="text-red-400 hover:text-red-500">
+                                    <button class="link-danger">
                                         Delete
                                     </button>
                                 </form>

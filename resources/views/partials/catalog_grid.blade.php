@@ -44,24 +44,19 @@
                 $isPc = $product->category && in_array($product->category->name, $pcCategories);
             @endphp
 
-            <div class="flex justify-between mt-4 gap-2">
+            <div class="product-actions flex justify-between gap-2 mt-4">
 
-                <a href="{{ route('product.show', $product) }}"
-                   class="details-btn">
+                <a href="{{ route('product.show', $product) }}" class="details-btn">
                     Details
                 </a>
 
-                {{-- FAVORITE --}}
                 <form method="POST"
                       action="{{ route('favorites.add', $product->id) }}"
                       data-favorite-form="add">
                     @csrf
-                    <button class="gray-btn px-3 py-2 rounded text-sm">
-                        Favorite
-                    </button>
+                    <button class="gray-btn">Favorite</button>
                 </form>
 
-                {{-- CART --}}
                 <form method="POST"
                       action="{{ route('cart.add', $product->id) }}"
                       data-cart-form="add">

@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <div class="max-w-7xl mx-auto px-6 py-12 text-white">
+    <div class="page-container">
 
         {{-- HEADER --}}
         <h1 class="page-title mb-2">{{ $product->name }}</h1>
@@ -16,9 +16,7 @@
             @endif
         </p>
 
-
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div class="product-layout">
 
             {{-- ======================= --}}
             {{-- LEFT COLUMN — IMAGE --}}
@@ -28,8 +26,6 @@
                      alt="{{ $product->name }}"
                      class="product-main-img">
             </div>
-
-
 
             {{-- ======================= --}}
             {{-- RIGHT COLUMN — DETAILS --}}
@@ -64,31 +60,28 @@
                     </div>
                 @endif
 
-
-
                 @php
                     $pcCategories = ['Gaming PCs', 'Workstations', 'Office PCs'];
                     $isPc = $product->category && in_array($product->category->name, $pcCategories);
                 @endphp
 
-                {{-- na mobile dame tlacidla pod seba, na sirsich obrazovkach do riadku --}}
-                <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 mt-8">
+                {{-- на мобильных кнопки под собой, на шире – в ряд --}}
+                <div class="product-actions">
 
                     <form method="POST"
                           action="{{ route('cart.add', $product->id) }}"
                           data-cart-form="add">
                         @csrf
-                        <button class="blue-btn px-6 py-3 rounded-lg w-full sm:w-auto text-center">
+                        <button class="product-action-btn blue-btn w-full sm:w-auto">
                             Add to Cart
                         </button>
                     </form>
 
-                    {{-- FAVORITE --}}
                     <form method="POST"
                           action="{{ route('favorites.add', $product->id) }}"
                           data-favorite-form="add">
                         @csrf
-                        <button class="gray-btn px-6 py-3 rounded-lg w-full sm:w-auto text-center">
+                        <button class="product-action-btn gray-btn w-full sm:w-auto">
                             Favorite
                         </button>
                     </form>
@@ -98,15 +91,14 @@
                               action="{{ route('compare.add', $product->id) }}"
                               data-compare-form="add">
                             @csrf
-                            <button type="submit"
-                                    class="gray-btn px-6 py-3 rounded-lg w-full sm:w-auto text-center">
+                            <button type="submit" class="product-action-btn gray-btn w-full sm:w-auto">
                                 Add to Compare
                             </button>
                         </form>
                     @endif
 
                     <a href="{{ route('catalog.index') }}"
-                       class="gray-btn px-6 py-3 rounded-lg w-full sm:w-auto text-center">
+                       class="product-action-btn gray-btn w-full sm:w-auto">
                         Back to Catalog
                     </a>
 

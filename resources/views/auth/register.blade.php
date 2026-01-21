@@ -15,28 +15,47 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('register') }}" class="form-space" id="registerForm">
+            <form method="POST"
+                  action="{{ route('register') }}"
+                  class="form-space"
+                  id="registerForm">
                 @csrf
 
                 <div class="form-group">
                     <label class="form-label">Name</label>
-                    <input type="text" name="name" class="input" required>
+                    <input type="text"
+                           name="name"
+                           class="input"
+                           value="{{ old('name') }}"
+                           autocomplete="name"
+                           required>
                     <p class="input-error" data-error="name"></p>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Email</label>
-                    <input type="email" name="email" class="input" required>
+                    <input type="email"
+                           name="email"
+                           class="input"
+                           value="{{ old('email') }}"
+                           autocomplete="email"
+                           required>
                     <p class="input-error" data-error="email"></p>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="password" name="password" class="input" required>
+                    <input type="password"
+                           name="password"
+                           class="input"
+                           autocomplete="new-password"
+                           required>
                     <p class="input-error" data-error="password"></p>
                 </div>
 
-                <button class="btn-primary w-full">Create Account</button>
+                <button type="submit" class="btn-primary w-full">
+                    Create Account
+                </button>
             </form>
 
             <p class="auth-switch">

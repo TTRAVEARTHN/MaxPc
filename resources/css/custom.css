@@ -6,32 +6,7 @@
 .footer-bg { background-color: #11131a; }
 .stats-bg { background-color:#0d0f16; }
 
-.hamburger {
-    width: 28px;
-    height: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    cursor: pointer;
-}
 
-.hamburger span {
-    display: block;
-    height: 3px;
-    background: #e5e7eb;
-    border-radius: 4px;
-    transition: .3s;
-}
-
-.hamburger.active span:nth-child(1) {
-    transform: translateY(8px) rotate(45deg);
-}
-.hamburger.active span:nth-child(2) {
-    opacity: 0;
-}
-.hamburger.active span:nth-child(3) {
-    transform: translateY(-8px) rotate(-45deg);
-}
 .mobile-link {
     display: block;                 /* vsetko po sirke riadku klikatelne */
     width: 100%;                    /* plna sirka kontajnera */
@@ -105,8 +80,13 @@
 
 /* Button used in catalog cards */
 .details-btn,
-.cart-btn {
-    padding: 6px 14px;
+.cart-btn,
+.gray-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 0;      /* одинаковая ширина в ряду */
+    padding: 8px 0;
     border-radius: 6px;
     transition: .2s;
     color: white;
@@ -123,6 +103,33 @@
 }
 .cart-btn:hover {
     background:#6a89c8;
+}
+
+/* GRAY BUTTON */
+.gray-btn {
+    background-color: #2c3240;
+}
+.gray-btn:hover {
+    background-color: #3a4153;
+}
+/* Мобильный режим: кнопки под друг другом, на всю ширину */
+@media (max-width: 640px) {
+    .product-content .flex {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .details-btn,
+    .gray-btn,
+    .cart-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .product-content {
+        height: auto;    /* вместо фиксированных 210px */
+    }
 }
 
 
@@ -182,12 +189,7 @@
     background: #10131a;
 }
 
-/* CONTENT FIXED HEIGHT */
-.product-content {
-    display: flex;
-    flex-direction: column;
-    height: 210px;
-}
+
 
 /* TITLE */
 .product-title {
@@ -351,9 +353,60 @@
     @apply bg-red-600 text-white;
 }
 
+/* Orders page specific layout */
+.orders-table-wrapper {
+    overflow-x: auto;
+}
 
+/* Минимальная ширина таблицы заказов (перенесли из min-w-[800px]) */
+.orders-table {
+    min-width: 800px;
+}
 
+/* Колонка Actions фиксированной ширины */
+.table-actions-col {
+    width: 90px;
+}
 
+/* Опасная ссылка-кнопка (Delete) в стиле проекта */
+.link-danger {
+    color: #f87171;          /* тот же тон, что и delete-btn */
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: .2s;
+    white-space: nowrap;
+}
+.link-danger:hover {
+    color: #fecaca;
+}
+
+/* Строка спецификации продукта */
+.spec-row {
+    display: flex;
+    gap: 8px;
+}
+
+/* Файл-инпут в стиле остальной формы */
+.file-input {
+    width: 100%;
+    color: #d1d5db;
+    font-size: 0.9rem;
+}
+
+.file-input::file-selector-button {
+    background: #2b3142;
+    border: 1px solid #3a4153;
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin-right: 12px;
+    cursor: pointer;
+    color: #e5e7eb;
+    transition: .2s;
+}
+
+.file-input::file-selector-button:hover {
+    background: #3a4153;
+}
 
 
 .cart-title {
@@ -459,6 +512,336 @@
 .item-price {
     font-weight: 600;
 }
+
+/* Строка спецификации продукта (если ещё не добавлял) */
+.spec-row {
+    display: flex;
+    gap: 8px;
+}
+
+/* Favorites grid */
+.favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 24px; /* аналог gap-6 */
+
+    /* responsive как было */
+}
+@media (min-width: 640px) { /* sm */
+    .favorites-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (min-width: 1024px) { /* lg */
+    .favorites-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+/* Layout карточки продукта (страница товара) */
+.product-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px; /* gap-10 */
+}
+
+@media (min-width: 768px) { /* md */
+    .product-layout {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.product-actions{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:32px;
+}
+
+@media (min-width:640px){
+    .product-actions{
+        flex-direction:row;
+        flex-wrap:wrap;
+        align-items:stretch; /* выравнивает высоту */
+    }
+}
+
+.product-action-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:12px 24px;
+    border-radius:12px;
+    font-weight:600;
+    font-size:.95rem;
+    line-height:1;
+    white-space:nowrap;
+}
+
+/* Контейнер страницы аккаунта: уже есть page-container, просто сужаем */
+.account-page {
+    max-width: 768px; /* примерно 3xl */
+}
+
+/* Обёртка для таблицы заказов (overflow-x-auto) */
+.account-orders-wrapper {
+    overflow-x: auto;
+}
+
+/* Таблица заказов в аккаунте — ширина и размер шрифта */
+.account-orders-table {
+    width: 100%;
+    font-size: 0.9rem; /* аналог text-sm */
+}
+/* Страница корзины использует общий page-container, поэтому тут только сетка */
+
+/* Основной layout корзины (2 колонки на lg) */
+.cart-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px; /* gap-8 */
+}
+
+@media (min-width: 1024px) { /* lg */
+    .cart-layout {
+        grid-template-columns: 2fr 1fr;
+    }
+}
+
+/* Колонка с товарами (бывшие lg:col-span-2 space-y-6) */
+.cart-items {
+    display: flex;
+    flex-direction: column;
+    gap: 24px; /* space-y-6 */
+}
+/* Checkout page ширина (ранее была max-w-4xl) */
+.checkout-page {
+    max-width: 896px; /* ~ 4xl (56rem) */
+}
+
+/* Отключённая кнопка на чекауте */
+.checkout-btn-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+/* контактная форма = прежний max-w-xl */
+.contact-page {
+    max-width: 640px; /* XL = 40rem */
+}
+/* hero inner layout */
+.hero-inner {
+    max-width: 1280px; /* max-w-7xl */
+    margin: 0 auto;
+    padding: 0 32px; /* px-8 */
+    position: relative;
+    z-index: 10;
+}
+
+/* stats section */
+.stats-section {
+    padding: 80px 0; /* py-20 */
+}
+
+/* grid stats */
+.stats-grid {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    gap: 40px; /* gap-10 */
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    text-align: center;
+}
+@media (min-width: 640px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (min-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+/* CTA */
+.cta-section {
+    padding: 112px 0; /* py-28 */
+    text-align: center;
+}
+
+.cta-title {
+    font-size: 1.5rem; /* text-2xl */
+    font-weight: 600;
+    color: white;
+    margin-bottom: 16px; /* mb-4 */
+}
+
+.cta-subtitle {
+    color: #aeb7c5; /* близко к text-gray-400 */
+    max-width: 42rem; /* max-w-2xl */
+    margin: 0 auto 40px;
+}
+.product-spec {
+    font-size: 0.85rem;
+    color: #aaa;
+    line-height: 1.2;
+    height: 48px;
+    overflow: hidden;
+}
+
+/* вынос space-y-1 */
+.product-spec li {
+    margin-bottom: 4px; /* примерно как space-y-1 */
+}
+
+.product-spec li:last-child {
+    margin-bottom: 0;
+}
+/* Превью текущего изображения товара */
+.product-image-preview {
+    width: 128px;
+    height: 128px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #2c3240;
+    margin-bottom: 12px;
+    background: #10131a;
+}
+
+/* Красная кнопка (удаление продукта) */
+.danger-btn {
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    background: #b91c1c;
+    color: #fef2f2;
+    transition: .2s;
+    text-align: center;
+}
+.danger-btn:hover {
+    background: #991b1b;
+}
+
+/* Общий wrapper для таблиц в админке */
+.admin-table-wrapper {
+    overflow-x: auto;
+}
+/* Бейджи (счётчики Favorites / Compare / Cart) */
+.nav-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 6px;          /* px-2 / px-1.5, py-0.5 */
+    font-size: 0.75rem;        /* text-xs */
+    border-radius: 999px;      /* rounded pill */
+    background: #2563eb;       /* тот же синий, что и кнопки */
+    color: #ffffff;
+}
+
+/* Минимальная ширина таблицы продуктов (переносим min-w-[700px]) */
+.admin-table {
+    min-width: 700px;
+}
+
+/* Колонки с фиксированной шириной */
+.table-col-id {
+    width: 50px;
+}
+
+.table-col-price {
+    width: 130px;
+}
+
+.table-col-actions {
+    width: 120px;
+}
+
+/* Ячейка и контейнер для экшенов */
+.table-actions-cell {
+    white-space: nowrap;
+}
+
+.table-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Ссылки-действия */
+.link-primary {
+    color: #60a5fa;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: .2s;
+}
+.link-primary:hover {
+    color: #93c5fd;
+}
+
+/* link-danger уже есть, если нет — вот он: */
+.link-danger {
+    color: #f87171;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: .2s;
+    white-space: nowrap;
+}
+.link-danger:hover {
+    color: #fecaca;
+}
+.admin-table-wrapper {
+    overflow-x: auto;
+}
+
+.admin-table {
+    min-width: 700px; /* можно другой размер, если хочешь, но этого хватит */
+}
+
+.table-col-id {
+    width: 50px;
+}
+
+.table-col-actions {
+    width: 120px;
+}
+
+.table-actions-cell {
+    white-space: nowrap;
+}
+
+/* Если ещё не добавлял */
+.table-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* link-danger, если ещё не закинул */
+.link-danger {
+    color: #f87171;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: .2s;
+    white-space: nowrap;
+}
+.link-danger:hover {
+    color: #fecaca;
+}
+
+/* Compare table ширина */
+.compare-table {
+    min-width: 900px;
+}
+
+/* Левая колонка "Feature" */
+.compare-feature-col {
+    min-width: 160px;
+}
+
+/* Колонка одного продукта в сравнении */
+.compare-product-col {
+    min-width: 220px;
+}
+
 
 /* Total */
 .checkout-total {

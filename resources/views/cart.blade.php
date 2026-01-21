@@ -2,14 +2,14 @@
 
 @section('content')
 
-    <div class="max-w-7xl mx-auto px-6 py-10 text-white">
+    <div class="page-container">
 
-        <h1 class="text-2xl font-semibold mb-6">Shopping Cart</h1>
+        <h1 class="page-title mb-6">Shopping Cart</h1>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="cart-layout">
 
             {{-- LEFT COLUMN — CART ITEMS --}}
-            <div class="lg:col-span-2 space-y-6" id="cartItemsWrapper">
+            <div class="cart-items" id="cartItemsWrapper">
 
                 @forelse($items as $item)
                     <div class="cart-item"
@@ -19,8 +19,8 @@
                         {{-- PRODUCT INFO --}}
                         <div class="flex items-center gap-4">
                             <img src="{{ $item->product->main_image
-                    ? asset('storage/' . $item->product->main_image)
-                    : asset('images/fallback.png') }}"
+                                ? asset('storage/' . $item->product->main_image)
+                                : asset('images/fallback.png') }}"
                                  class="w-24 h-24 rounded object-cover">
 
                             <div>
@@ -52,8 +52,8 @@
 
                             {{-- тут добавляем класс, чтобы JS мог найти это место --}}
                             <span class="text-lg cart-qty-display">
-                    {{ $item->quantity }}
-                </span>
+                                {{ $item->quantity }}
+                            </span>
 
                             {{-- Plus --}}
                             <form method="POST"
@@ -122,7 +122,7 @@
 
                     <a href="{{ route('login.form') }}"
                        class="checkout-btn text-center">
-                        🔐 Log In to Continue
+                        Log In to Continue
                     </a>
 
                 @else

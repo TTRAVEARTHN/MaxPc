@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <div class="max-w-7xl mx-auto px-6 py-10 text-white">
+    <div class="page-container">
 
         <h1 class="page-title mb-6">My Favorites</h1>
 
@@ -13,13 +13,13 @@
         @if($favorites->isEmpty())
             <p class="text-gray-400">You have no favorite products yet.</p>
         @else
+
             {{-- ОБЁРТКА, с которой работают скрипты (favoritesAjax.ts) --}}
-            <div id="favoritesWrapper" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div id="favoritesWrapper" class="favorites-grid">
 
                 @foreach($favorites as $fav)
                     @php($product = $fav->product)
                     @if(!$product) @continue @endif
-
 
                     <div class="product-card favorite-item">
 
@@ -43,7 +43,7 @@
                                     Details
                                 </a>
 
-                                {{-- ВАЖНО: data-favorite-form="remove" --}}
+                                {{-- Важно: data-favorite-form="remove" --}}
                                 <form method="POST"
                                       action="{{ route('favorites.remove', $product->id) }}"
                                       data-favorite-form="remove">
@@ -60,6 +60,7 @@
                 @endforeach
 
             </div>
+
         @endif
 
     </div>

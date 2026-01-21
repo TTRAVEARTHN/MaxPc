@@ -10,13 +10,13 @@
         <form action="{{ route('admin.products.update', $product->id) }}"
               method="POST"
               enctype="multipart/form-data"
-              class="card-box space-y-6">
+              class="card-box form-space">
 
             @csrf
             @method('PATCH')
 
             {{-- NAME --}}
-            <div>
+            <div class="form-group">
                 <label class="form-label">Product Name</label>
                 <input type="text"
                        name="name"
@@ -26,7 +26,7 @@
             </div>
 
             {{-- PRICE --}}
-            <div>
+            <div class="form-group">
                 <label class="form-label">Price ($)</label>
                 <input type="number"
                        name="price"
@@ -37,9 +37,9 @@
             </div>
 
             {{-- CATEGORY --}}
-            <div>
+            <div class="form-group">
                 <label class="form-label">Category</label>
-                <select name="category_id" class="input bg-[#2b3142]">
+                <select name="category_id" class="select w-full">
                     <option value="">No Category</option>
                     @foreach($categories as $cat)
                         <option value="{{ $cat->id }}" @selected($product->category_id == $cat->id)>
@@ -50,7 +50,7 @@
             </div>
 
             {{-- DESCRIPTION --}}
-            <div>
+            <div class="form-group">
                 <label class="form-label">Description</label>
                 <textarea name="description"
                           rows="4"
@@ -58,14 +58,14 @@
             </div>
 
             {{-- SPECS --}}
-            <div>
+            <div class="form-group">
                 <label class="form-label">Specifications</label>
 
                 @php
                     // берём либо old('specs'), либо текущий specs из модели
                     $rawSpecs = old('specs', $product->specs ?? []);
 
-                    // превращаем в массив вида [ ['key'=>..., 'value'=>...], ...]
+                    // приводим к массиву вида [ ['key'=>..., 'value'=>...], ...]
                     if (!empty($rawSpecs) && is_array($rawSpecs)) {
                         // вариант: пришло с формы как [ ['key'=>..,'value'=>..], ...]
                         if (isset($rawSpecs[0]) && is_array($rawSpecs[0]) && array_key_exists('key', $rawSpecs[0])) {
@@ -82,9 +82,9 @@
                     }
                 @endphp
 
-                <div id="specs-wrapper" class="space-y-2">
+                <div id="specs-wrapper" class="spec-list">
                     @foreach($existingSpecs as $i => $spec)
-                        <div class="flex gap-2 spec-row">
+                        <div class="spec-row">
                             <input type="text"
                                    name="specs[{{ $i }}][key]"
                                    class="input"
@@ -98,7 +98,7 @@
                                    value="{{ $spec['value'] ?? '' }}">
 
                             <button type="button"
-                                    class="gray-btn px-3 py-2 rounded text-sm remove-spec-row">
+                                    class="gray-btn px-3 py-2 text-sm remove-spec-row">
                                 ✕
                             </button>
                         </div>
@@ -107,25 +107,25 @@
 
                 <button type="button"
                         id="add-spec-row"
-                        class="gray-btn mt-2 px-4 py-2 rounded text-sm">
+                        class="gray-btn mt-2 px-4 py-2 text-sm">
                     + Add specification
                 </button>
 
                 @error('specs.*.key')
-                <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                <p class="input-error">{{ $message }}</p>
                 @enderror
                 @error('specs.*.value')
-                <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                <p class="input-error">{{ $message }}</p>
                 @enderror
             </div>
 
             {{-- IMAGE --}}
-            <div>
+            <div class="form-group">
                 <label class="form-label">Current Image</label>
 
                 @if($product->main_image)
                     <img src="{{ asset('storage/' . $product->main_image) }}"
-                         class="w-32 h-32 object-cover rounded border border-gray-700 mb-3">
+                         class="product-image-preview">
                 @else
                     <p class="text-gray-500 mb-3">No image uploaded</p>
                 @endif
@@ -134,11 +134,11 @@
                 <input type="file"
                        name="main_image"
                        accept="image/*"
-                       class="text-gray-300">
+                       class="file-input">
             </div>
 
             {{-- SAVE BUTTON --}}
-            <button type="submit" class="blue-btn w-full py-3 rounded">
+            <button type="submit" class="blue-btn w-full">
                 Save Changes
             </button>
 
@@ -152,7 +152,7 @@
             @csrf
             @method('DELETE')
 
-            <button class="w-full bg-red-600 hover:bg-red-700 py-3 rounded font-semibold">
+            <button class="danger-btn">
                 Delete Product
             </button>
         </form>
@@ -187,23 +187,23 @@
 
             addBtn.addEventListener('click', () => {
                 const row = document.createElement('div');
-                row.className = 'flex gap-2 spec-row';
+                row.className = 'spec-row';
                 row.innerHTML = `
-                <input type="text"
-                       name="specs[${index}][key]"
-                       class="input"
-                       placeholder="e.g. CPU">
+                    <input type="text"
+                           name="specs[${index}][key]"
+                           class="input"
+                           placeholder="e.g. CPU">
 
-                <input type="text"
-                       name="specs[${index}][value]"
-                       class="input"
-                       placeholder="e.g. Intel i9">
+                    <input type="text"
+                           name="specs[${index}][value]"
+                           class="input"
+                           placeholder="e.g. Intel i9">
 
-                <button type="button"
-                        class="gray-btn px-3 py-2 rounded text-sm remove-spec-row">
-                    ✕
-                </button>
-            `;
+                    <button type="button"
+                            class="gray-btn px-3 py-2 text-sm remove-spec-row">
+                        ✕
+                    </button>
+                `;
                 index++;
                 wrapper.appendChild(row);
                 attachRemoveHandlers();

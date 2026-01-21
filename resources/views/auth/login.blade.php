@@ -13,22 +13,40 @@
                 <div class="alert-error">{{ session('error') }}</div>
             @endif
 
-            <form method="POST" action="{{ route('login') }}" class="form-space" id="loginForm">
+            <form method="POST"
+                  action="{{ route('login') }}"
+                  class="form-space"
+                  id="loginForm">
                 @csrf
 
                 <div class="form-group">
                     <label class="form-label">Email</label>
-                    <input type="email" name="email" class="input" required>
+                    <input
+                        type="email"
+                        name="email"
+                        class="input"
+                        value="{{ old('email') }}"
+                        autocomplete="email"
+                        required
+                    >
                     <p class="input-error" data-error="email"></p>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="password" name="password" class="input" required>
+                    <input
+                        type="password"
+                        name="password"
+                        class="input"
+                        autocomplete="current-password"
+                        required
+                    >
                     <p class="input-error" data-error="password"></p>
                 </div>
 
-                <button class="btn-primary w-full">Login</button>
+                <button type="submit" class="btn-primary w-full">
+                    Login
+                </button>
             </form>
 
             <p class="auth-switch">

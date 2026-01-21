@@ -6,8 +6,7 @@
     {{-- HERO SECTION --}}
     {{-- =============================== --}}
     <section class="hero-section">
-        <div class="max-w-7xl mx-auto px-8 relative z-10">
-
+        <div class="hero-inner">
             <h1 class="hero-title mb-6">
                 Buy Your Dream PC
             </h1>
@@ -20,17 +19,15 @@
             <a href="{{ route('catalog.index') }}" class="blue-btn">
                 Choose from Catalog
             </a>
-
         </div>
     </section>
-
 
 
     {{-- =============================== --}}
     {{-- STATS SECTION --}}
     {{-- =============================== --}}
-    <section class="stats-bg py-20">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 text-center gap-10">
+    <section class="stats-bg stats-section">
+        <div class="stats-grid">
 
             <div>
                 <div class="stats-icon mb-2">👥</div>
@@ -60,17 +57,16 @@
     </section>
 
 
-
     {{-- =============================== --}}
     {{-- CALL TO ACTION --}}
     {{-- =============================== --}}
-    <section class="py-28 text-center">
+    <section class="cta-section">
 
-        <h2 class="text-2xl text-white font-semibold mb-4">
+        <h2 class="cta-title">
             Ready to Get Started?
         </h2>
 
-        <p class="text-gray-400 max-w-2xl mx-auto mb-10">
+        <p class="cta-subtitle">
             Browse our catalog of gaming PCs, workstations, and peripherals.
             Every system comes with a 2-year warranty and free technical support.
         </p>

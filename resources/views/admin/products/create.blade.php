@@ -10,12 +10,12 @@
         <form method="POST"
               action="{{ route('admin.products.store') }}"
               enctype="multipart/form-data"
-              class="card-box space-y-6">
+              class="card-box form-space">
 
             @csrf
 
             {{-- NAME --}}
-            <div>
+            <div class="form-group">
                 <label class="form-label">Product Name</label>
                 <input type="text" name="name" required
                        class="input"
@@ -23,16 +23,17 @@
             </div>
 
             {{-- PRICE --}}
-            <div>
+            <div class="form-group">
                 <label class="form-label">Price ($)</label>
                 <input type="number" step="0.01" name="price" required
-                       class="input" placeholder="3499">
+                       class="input"
+                       placeholder="3499">
             </div>
 
             {{-- CATEGORY --}}
-            <div>
+            <div class="form-group">
                 <label class="form-label">Category</label>
-                <select name="category_id" class="input bg-[#2b3142]">
+                <select name="category_id" class="select w-full">
                     <option value="">No Category</option>
                     @foreach($categories as $cat)
                         <option value="{{ $cat->id }}">{{ $cat->name }}</option>
@@ -41,7 +42,7 @@
             </div>
 
             {{-- DESCRIPTION --}}
-            <div>
+            <div class="form-group">
                 <label class="form-label">Description</label>
                 <textarea name="description" rows="4"
                           class="input"
@@ -49,7 +50,7 @@
             </div>
 
             {{-- SPECS --}}
-            <div>
+            <div class="form-group">
                 <label class="form-label">Specifications</label>
 
                 @php
@@ -59,9 +60,9 @@
                     ]);
                 @endphp
 
-                <div id="specs-wrapper" class="space-y-2">
+                <div id="specs-wrapper" class="spec-list">
                     @foreach($oldSpecs as $i => $spec)
-                        <div class="flex gap-2 spec-row">
+                        <div class="spec-row">
                             <input type="text"
                                    name="specs[{{ $i }}][key]"
                                    class="input"
@@ -75,7 +76,7 @@
                                    value="{{ $spec['value'] ?? '' }}">
 
                             <button type="button"
-                                    class="gray-btn px-3 py-2 rounded text-sm remove-spec-row">
+                                    class="gray-btn px-3 py-2 text-sm remove-spec-row">
                                 ✕
                             </button>
                         </div>
@@ -84,28 +85,28 @@
 
                 <button type="button"
                         id="add-spec-row"
-                        class="gray-btn mt-2 px-4 py-2 rounded text-sm">
+                        class="gray-btn mt-2 px-4 py-2 text-sm">
                     + Add specification
                 </button>
 
                 @error('specs.*.key')
-                <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                <p class="input-error">{{ $message }}</p>
                 @enderror
                 @error('specs.*.value')
-                <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                <p class="input-error">{{ $message }}</p>
                 @enderror
             </div>
 
             {{-- IMAGE --}}
-            <div>
+            <div class="form-group">
                 <label class="form-label">Main Image</label>
                 <input type="file" name="main_image"
-                       class="text-gray-300"
+                       class="file-input"
                        accept="image/*">
             </div>
 
             {{-- SUBMIT --}}
-            <button type="submit" class="blue-btn w-full py-3 rounded">
+            <button type="submit" class="blue-btn w-full">
                 Create Product
             </button>
 
@@ -141,23 +142,23 @@
 
             addBtn.addEventListener('click', () => {
                 const row = document.createElement('div');
-                row.className = 'flex gap-2 spec-row';
+                row.className = 'spec-row';
                 row.innerHTML = `
-                <input type="text"
-                       name="specs[${index}][key]"
-                       class="input"
-                       placeholder="e.g. CPU">
+                    <input type="text"
+                           name="specs[${index}][key]"
+                           class="input"
+                           placeholder="e.g. CPU">
 
-                <input type="text"
-                       name="specs[${index}][value]"
-                       class="input"
-                       placeholder="e.g. Intel i9">
+                    <input type="text"
+                           name="specs[${index}][value]"
+                           class="input"
+                           placeholder="e.g. Intel i9">
 
-                <button type="button"
-                        class="gray-btn px-3 py-2 rounded text-sm remove-spec-row">
-                    ✕
-                </button>
-            `;
+                    <button type="button"
+                            class="gray-btn px-3 py-2 text-sm remove-spec-row">
+                        ✕
+                    </button>
+                `;
                 index++;
                 wrapper.appendChild(row);
                 attachRemoveHandlers();

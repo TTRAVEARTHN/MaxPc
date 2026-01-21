@@ -35,16 +35,16 @@
         </div>
 
         {{-- TABLE WRAPPER --}}
-        <div class="card-box overflow-x-auto">
+        <div class="card-box admin-table-wrapper">
 
-            <table class="table min-w-[700px]">
+            <table class="table admin-table">
                 <thead>
                 <tr>
-                    <th style="width: 50px;">ID</th>
+                    <th class="table-col-id">ID</th>
                     <th>Name</th>
                     <th>Category</th>
-                    <th style="width: 130px;">Price</th>
-                    <th style="width: 120px;">Actions</th>
+                    <th class="table-col-price">Price</th>
+                    <th class="table-col-actions">Actions</th>
                 </tr>
                 </thead>
 
@@ -70,24 +70,26 @@
                         </td>
 
                         {{-- ACTIONS --}}
-                        <td class="flex gap-3">
-                            {{-- EDIT --}}
-                            <a href="{{ route('admin.products.edit', $p->id) }}"
-                               class="text-blue-400 hover:text-blue-500">
-                                Edit
-                            </a>
+                        <td class="table-actions-cell">
+                            <div class="table-actions">
+                                {{-- EDIT --}}
+                                <a href="{{ route('admin.products.edit', $p->id) }}"
+                                   class="link-primary">
+                                    Edit
+                                </a>
 
-                            {{-- DELETE --}}
-                            <form action="{{ route('admin.products.delete', $p->id) }}"
-                                  method="POST"
-                                  onsubmit="return confirm('Delete this product?');">
-                                @csrf
-                                @method('DELETE')
+                                {{-- DELETE --}}
+                                <form action="{{ route('admin.products.delete', $p->id) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('Delete this product?');">
+                                    @csrf
+                                    @method('DELETE')
 
-                                <button class="text-red-400 hover:text-red-500">
-                                    Delete
-                                </button>
-                            </form>
+                                    <button class="link-danger">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 @empty

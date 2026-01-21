@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <div class="max-w-7xl mx-auto px-6 py-12 text-white">
+    <div class="page-container">
 
         {{-- =============================== --}}
         {{-- PAGE HEADER --}}
@@ -70,15 +70,13 @@
             </form>
 
             <span class="text-gray-500 ml-auto" id="productCount">
-        {{ $products->total() }} products
-    </span>
+                {{ $products->total() }} products
+            </span>
 
         </div>
 
         {{-- CATALOG GRID --}}
-
-        <div id="catalogGrid"
-             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div id="catalogGrid" class="favorites-grid">
             @include('partials.catalog_grid', ['products' => $products])
         </div>
 
@@ -100,7 +98,6 @@
                 </a>
             @endif
         </div>
-
 
     </div>
 

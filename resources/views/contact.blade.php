@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <div class="max-w-xl mx-auto py-10 px-6 text-white">
+    <div class="page-container contact-page">
 
         <h1 class="page-title mb-6">Contact Us</h1>
 
@@ -13,7 +13,7 @@
             </div>
         @endif
 
-        {{-- VALIDATION ERRORS (общий блок) --}}
+        {{-- VALIDATION ERRORS --}}
         @if($errors->any())
             <div class="alert-error mb-4">
                 Please fix the errors below.
@@ -23,7 +23,9 @@
         <div class="panel">
             <h2 class="panel-title mb-4">Send us a message</h2>
 
-            <form method="POST" action="{{ route('contact.send') }}" class="form-space">
+            <form method="POST"
+                  action="{{ route('contact.send') }}"
+                  class="form-space">
                 @csrf
 
                 {{-- NAME --}}

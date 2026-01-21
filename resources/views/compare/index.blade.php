@@ -48,15 +48,15 @@
 
                 <div id="compareWrapper" class="card-box overflow-x-auto">
 
-                    <table class="table min-w-[900px]">
+                    <table class="table compare-table">
                         <thead>
                         <tr>
                             {{-- левая колонка с названиями характеристик --}}
-                            <th class="min-w-[160px]">Feature</th>
+                            <th class="compare-feature-col">Feature</th>
 
                             {{-- по одному столбцу на каждый товар --}}
                             @foreach($products as $p)
-                                <th class="min-w-[220px] align-top"
+                                <th class="compare-product-col align-top"
                                     data-compare-product-id="{{ $p->id }}">
                                     <div class="flex items-start justify-between gap-2">
 
