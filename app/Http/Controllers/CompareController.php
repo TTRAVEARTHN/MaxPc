@@ -7,13 +7,13 @@ use Illuminate\Http\Request;
 
 class CompareController extends Controller
 {
-    /**
-     * Список товаров для сравнения.
-     */
+
     public function index()
     {
+        // zoberieme ID produktov z session
         $ids = session('compare', []);
 
+        // nacitame produkty podla ID zo session
         $products = Product::with('category')
             ->whereIn('id', $ids)
             ->get();
@@ -21,14 +21,12 @@ class CompareController extends Controller
         return view('compare.index', compact('products'));
     }
 
-    /**
-     * Добавить товар в сравнение.
-     */
     public function add(Request $request, Product $product)
     {
+        // aktualny stav porovnania zo session
         $compare = session('compare', []);
 
-        // уже есть в сравнении
+        // uz je v porovnani
         if (in_array($product->id, $compare)) {
             $message = 'Product is already in compare list.';
 
@@ -43,7 +41,7 @@ class CompareController extends Controller
             return back()->with('info', $message);
         }
 
-        // максимум 4 товара
+        // maximum 4 produkty
         if (count($compare) >= 4) {
             $message = 'You can compare up to 4 products.';
 
@@ -58,7 +56,7 @@ class CompareController extends Controller
             return back()->with('error', $message);
         }
 
-        // разрешаем только ПК-категории
+        // povolene len PC kategorie
         $categoryName        = optional($product->category)->name;
         $allowedPcCategories = ['Gaming PCs', 'Workstations', 'Office PCs'];
 
@@ -76,7 +74,7 @@ class CompareController extends Controller
             return back()->with('error', $message);
         }
 
-        // если в списке уже есть товары — проверяем, что первый тоже из списка разрешённых
+        // ak uz nieco v porovnani je, skontrolujeme prvy produkt
         if (!empty($compare)) {
             $firstProduct      = Product::with('category')->find(reset($compare));
             $firstCategoryName = optional($firstProduct->category)->name;
@@ -96,8 +94,7 @@ class CompareController extends Controller
             }
         }
 
-        // всё ок — добавляем
-
+        // vsetko ok, pridame ID produktu do session
         $compare[] = $product->id;
         session(['compare' => $compare]);
 
@@ -114,13 +111,11 @@ class CompareController extends Controller
         return back()->with('success', $message);
     }
 
-    /**
-     * Удалить один товар из сравнения.
-     */
     public function remove(Request $request, Product $product)
     {
         $compare = session('compare', []);
 
+        // odfiltrujeme ID odstraneneho produktu
         $compare = array_values(
             array_filter($compare, fn($id) => (int)$id !== (int)$product->id)
         );
@@ -140,11 +135,9 @@ class CompareController extends Controller
         return back()->with('success', $message);
     }
 
-    /**
-     * Очистить список сравнения.
-     */
     public function clear(Request $request)
     {
+        // uplne vymazeme kluc compare zo session
         session()->forget('compare');
 
         $message = 'Compare list cleared.';
@@ -160,9 +153,7 @@ class CompareController extends Controller
         return back()->with('success', $message);
     }
 
-    /**
-     * Вернуть только количество товаров в сравнении (для бейджика и pageshow).
-     */
+
     public function count()
     {
         $ids = session('compare', []);

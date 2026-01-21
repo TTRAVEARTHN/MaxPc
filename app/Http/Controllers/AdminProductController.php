@@ -8,11 +8,10 @@ use Illuminate\Http\Request;
 
 class AdminProductController extends Controller
 {
-    /**
-     * List all products
-     */
+
     public function index(Request $request)
     {
+        // jednoduche fulltext vyhladavanie podla nazvu
         $search = $request->query('search');
 
         $products = Product::with('category')
@@ -20,27 +19,26 @@ class AdminProductController extends Controller
                 $q->where('name', 'LIKE', "%$search%");
             })
             ->orderBy('created_at', 'desc')
+            // strankovanie po 20 kuskov
             ->paginate(20);
 
+        // posielame produkty do admin view
         return view('admin.products.products', compact('products'));
     }
 
-    /**
-     * Show form to create product
-     */
+
     public function create()
     {
+        // nacitame kategorie do selectu
         $categories = Category::orderBy('name')->get();
 
         return view('admin.products.create', compact('categories'));
     }
 
-    /**
-     * Store product in DB
-     */
     public function store(Request $request)
     {
         $data = $request->validate([
+            // kontrola ze kategoria existuje v tabulke categories
             'category_id' => 'nullable|exists:categories,id',
             'name'        => 'required|string|max:150',
             'description' => 'nullable|string',
@@ -53,7 +51,7 @@ class AdminProductController extends Controller
             'specs.*.value'   => 'nullable|string|max:255',
         ]);
 
-        // собрать характеристики в ассоциативный массив
+        // preklopenie specs z pola key/value na asociativne pole
         $specs = [];
         if (!empty($data['specs']) && is_array($data['specs'])) {
             foreach ($data['specs'] as $row) {
@@ -65,13 +63,15 @@ class AdminProductController extends Controller
                 }
             }
         }
+        // ak nie su specs, ulozime null aby to nebol prazdny array
         $data['specs'] = $specs ?: null;
-
-        // картинка
+        // upload hlavneho obrazku
         if ($request->hasFile('main_image')) {
+            // ulozenie do storage/app/public/products
             $data['main_image'] = $request->file('main_image')->store('products', 'public');
         }
 
+        // vytvorenie noveho produktu z validovanych dat
         Product::create($data);
 
         return redirect()
@@ -79,11 +79,9 @@ class AdminProductController extends Controller
             ->with('success', 'Product created successfully.');
     }
 
-    /**
-     * Edit page
-     */
     public function edit(Product $product)
     {
+        // kategorie do selectu pri editacii
         $categories = Category::orderBy('name')->get();
 
         return view('admin.products.edit', compact('product', 'categories'));
@@ -106,6 +104,7 @@ class AdminProductController extends Controller
             'specs.*.value'   => 'nullable|string|max:255',
         ]);
 
+        // rovnaka logika spracovania specs ako pri create
         $specs = [];
         if (!empty($data['specs']) && is_array($data['specs'])) {
             foreach ($data['specs'] as $row) {
@@ -120,9 +119,11 @@ class AdminProductController extends Controller
         $data['specs'] = $specs ?: null;
 
         if ($request->hasFile('main_image')) {
+            // pri update prepiseme cestu k obrazku na novu
             $data['main_image'] = $request->file('main_image')->store('products', 'public');
         }
 
+        // hromadny update existujuceho produktu
         $product->update($data);
 
         return redirect()
@@ -130,11 +131,10 @@ class AdminProductController extends Controller
             ->with('success', 'Product updated successfully.');
     }
 
-    /**
-     * Delete item
-     */
+
     public function delete(Product $product)
     {
+        // jednoduche delete, bez riesenia suboru z disku
         $product->delete();
 
         return redirect()

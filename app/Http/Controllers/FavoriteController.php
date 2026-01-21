@@ -9,11 +9,10 @@ use Illuminate\Support\Facades\Auth;
 
 class FavoriteController extends Controller
 {
-    /**
-     * Список избранных товаров пользователя.
-     */
+
     public function index()
     {
+        // ak nie je prihlaseny, posleme ho na login
         if (!Auth::check()) {
             return redirect()
                 ->route('login.form')
@@ -21,19 +20,20 @@ class FavoriteController extends Controller
         }
 
         $favorites = Favorite::with('product')
+            //loading produktov pre zoznam oblubenych
             ->where('user_id', Auth::id())
             ->get();
 
         return view('favorites.index', compact('favorites'));
     }
 
-    /**
-     * Добавить товар в избранное.
-     * Работает и для обычного POST, и для AJAX (как cart.add).
-     */
+
+     //Добавить товар в избранное.
+     //Работает и для обычного POST, и для AJAX (как cart.add).
     public function add(Request $request, Product $product)
     {
         if (!Auth::check()) {
+            // ak chce JSON (AJAX), vratime info ze treba login
             if ($request->expectsJson()) {
                 return response()->json([
                     'success'           => false,
@@ -53,6 +53,7 @@ class FavoriteController extends Controller
             ->where('product_id', $product->id)
             ->exists();
 
+        // kontrola, ci uz dany produkt je v oblubenych
         if ($exists) {
             if ($request->expectsJson()) {
                 $count = Favorite::where('user_id', $userId)->count();
@@ -67,6 +68,7 @@ class FavoriteController extends Controller
             return back()->with('info', 'Product is already in favorites.');
         }
 
+        // vytvorenie noveho zaznamu v oblubenych
         Favorite::create([
             'user_id'    => $userId,
             'product_id' => $product->id,
@@ -83,10 +85,7 @@ class FavoriteController extends Controller
 
         return back()->with('success', 'Product added to favorites.');
     }
-
-    /**
-     * Удалить товар из избранного.
-     */
+    //Удалить товар из избранного
     public function remove(Request $request, Product $product)
     {
         if (!Auth::check()) {
@@ -99,6 +98,7 @@ class FavoriteController extends Controller
 
         $userId = Auth::id();
 
+        // zmazanie konkretneho produktu z oblubenych
         Favorite::where('user_id', $userId)
             ->where('product_id', $product->id)
             ->delete();
@@ -115,9 +115,6 @@ class FavoriteController extends Controller
         return back()->with('success', 'Removed from favorites.');
     }
 
-    /**
-     * Счётчик избранного для бейджа в шапке (AJAX).
-     */
     public function count()
     {
         if (!Auth::check()) {

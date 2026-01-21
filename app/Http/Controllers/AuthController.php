@@ -8,9 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    /**
-     * Register new user
-     */
+
     public function register(Request $request)
     {
         $data = $request->validate([
@@ -19,7 +17,7 @@ class AuthController extends Controller
             'password' => 'required|min:6',
         ]);
 
-        // Create user
+        // vytvorenie usera, heslo sa ma hashovat cez mutator v modeli User
         $user = User::create([
             'name'     => $data['name'],
             'email'    => $data['email'],
@@ -27,16 +25,11 @@ class AuthController extends Controller
             'role'     => 'user',
         ]);
 
-        // Auto-login
+        // automaticke prihlasenie po registracii
         Auth::login($user);
-
-        // Redirect to home
         return redirect()->route('home')->with('success', 'Welcome! Your account has been created.');
     }
 
-    /**
-     * Login user
-     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -44,28 +37,26 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
+        // vratime sa s chybou ak prihlasenie zlyha
         if (!Auth::attempt($credentials)) {
             return back()->withErrors([
                 'email' => 'Incorrect email or password.',
             ]);
         }
 
+        // regeneracia session ID kvoli bezpecnosti
         $request->session()->regenerate();
-
-        // Redirect to home
         return redirect()->route('home')->with('success', 'You are now logged in!');
     }
 
-    /**
-     * Logout user
-     */
     public function logout(Request $request)
     {
+        // odhlasenie usera
         Auth::logout();
 
+        // zneplatnime staru session a token proti CSRF
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return redirect()->route('home')->with('success', 'Logged out successfully.');
     }
 }

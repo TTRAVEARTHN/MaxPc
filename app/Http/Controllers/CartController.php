@@ -10,26 +10,24 @@ use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
-    /**
-     * Show user's cart page
-     */
     public function index()
     {
+        // ak nie je user prihlaseny, presmerujeme na login
         if (!Auth::check()) {
             return redirect()->route('login.form');
         }
 
         $user = Auth::user();
 
-        // Create cart if not exists
+        // vytvorime kosik ak este neexistuje pre tohto usera
         $cart = Cart::firstOrCreate(['user_id' => $user->id]);
 
-        // Load items with product relation
+        // nacitame polozky kosika spolu s produktmi
         $items = CartItem::where('cart_id', $cart->id)
             ->with('product')
             ->get();
 
-        // Calculate totals
+        // vypocet medzisuctu
         $subtotal = $items->sum(function ($item) {
             return $item->product->price * $item->quantity;
         });
@@ -40,19 +38,19 @@ class CartController extends Controller
         //return view('cart', compact('items', 'subtotal', 'tax', 'total'));
 
         $response = response()->view('cart', compact('items', 'subtotal', 'tax', 'total'));
-
+        // zakaz cache pre stranku kosika
         return $response
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->header('Pragma', 'no-cache')
             ->header('Expires', '0');
     }
 
-    /**
-     * Add product to cart
-     */
+
     public function add(Request $request, Product $product)
     {
+
         if (!Auth::check()) {
+            // pre AJAX vraciame JSON s info ze treba login
             if ($request->boolean('ajax')) {
                 return response()->json([
                     'success' => false,
@@ -60,7 +58,7 @@ class CartController extends Controller
                     'login_url' => route('login.form'),
                 ]);
             }
-
+            //redirect na login
             return redirect()->route('login.form')
                 ->with('error', 'You must be logged in to use the cart.');
         }
@@ -68,14 +66,17 @@ class CartController extends Controller
         $user = Auth::user();
         $cart = Cart::firstOrCreate(['user_id' => $user->id]);
 
+        // hladame existujucu polozku tohto produktu v kosiku
         $item = CartItem::where('cart_id', $cart->id)
             ->where('product_id', $product->id)
             ->first();
 
         if ($item) {
+            // ak existuje, zvysime quantity
             $item->quantity += 1;
             $item->save();
         } else {
+            // ak nie, vytvorime novu polozku
             CartItem::create([
                 'cart_id' => $cart->id,
                 'product_id' => $product->id,
@@ -83,9 +84,10 @@ class CartController extends Controller
             ]);
         }
 
-        // пересчитываем общее количество позиций
+        // prepocteme celkovy pocet kusov v kosiku
         $count = CartItem::where('cart_id', $cart->id)->sum('quantity');
 
+        // odpoved pre AJAX
         if ($request->boolean('ajax')) {
             return response()->json([
                 'success' => true,
@@ -103,12 +105,13 @@ class CartController extends Controller
     public function update(Request $request, CartItem $item)
     {
         $request->validate([
+            // nepovolime nulu ani zaporne cisla
             'quantity' => 'required|integer|min:1',
         ]);
 
         $item->update(['quantity' => $request->quantity]);
 
-        // если AJAX – отдаём JSON
+        // ak ide o AJAX vratime JSON pre live update na stranke
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success'  => true,
@@ -116,14 +119,14 @@ class CartController extends Controller
             ]);
         }
 
-        // fallback на всякий случай
+        // fallback ak by to slo cez normalny form
         return back()->with('success', 'Cart updated.');
     }
 
     public function remove(Request $request, CartItem $item)
     {
         $item->delete();
-
+        // JSON odpoved pre AJAX mazanie polozky
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
@@ -134,15 +137,13 @@ class CartController extends Controller
         return back()->with('success', 'Item removed.');
     }
 
-    /**
-     * Clear user cart
-     */
     public function clear()
     {
         $user = Auth::user();
 
         $cart = Cart::where('user_id', $user->id)->first();
 
+        // zmazeme vsetky polozky kosika daneho usera
         if ($cart) {
             $cart->items()->delete();
         }
@@ -152,12 +153,14 @@ class CartController extends Controller
 
     public function count()
     {
+        // neprihlaseny user ma pocet 0
         if (!Auth::check()) {
             return response()->json(['count' => 0]);
         }
 
         $cart = Cart::with('items')->where('user_id', Auth::id())->first();
 
+        // ak kosik existuje, scitame pocet kusov
         $count = $cart ? $cart->items->sum('quantity') : 0;
 
         return response()->json(['count' => $count]);

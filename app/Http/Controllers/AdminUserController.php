@@ -8,11 +8,10 @@ use Illuminate\Http\Request;
 
 class AdminUserController extends Controller
 {
-    /**
-     * Show all users + search
-     */
+
     public function index(Request $request)
     {
+        // filter podla mena alebo emailu
         $search = $request->query('search');
 
         $users = User::query()
@@ -23,31 +22,15 @@ class AdminUserController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // posielame userov do admin view
         return view('admin.users.users', compact('users'));
     }
 
-    /**
-     * Promote user to admin
-     */
-    public function promote($userId)
-    {
-        $user = User::findOrFail($userId);
 
-        if ($user->role === 'admin') {
-            return back()->with('error', 'User is already an admin.');
-        }
 
-        $user->role = 'admin';
-        $user->save();
-
-        return back()->with('success', 'User promoted to admin.');
-    }
-
-    /**
-     * Delete user
-     */
     public function delete($userId)
     {
+        // nedovolime adminovi zmazat sam seba
         $user = User::findOrFail($userId);
 
         // нельзя удалить самого себя
@@ -55,6 +38,7 @@ class AdminUserController extends Controller
             return back()->with('error', 'You cannot delete yourself.');
         }
 
+        // zmazanie usera
         $user->delete();
 
         return back()->with('success', 'User deleted.');

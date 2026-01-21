@@ -10,21 +10,20 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    /**
-     * Show checkout page
-     */
+
     public function checkout()
     {
         $user = Auth::user();
 
-        // user must be logged in
+        // user musi byt prihlaseny
         if (!$user) {
             return redirect()->route('login.form')->with('error', 'Please, log in first.');
         }
 
-        // get user's cart
+        // nacitanie kosika daneho usera aj s polozkami a produktmi
         $cart = Cart::with('items.product')->where('user_id', $user->id)->first();
 
+        // redirect ak nema nic v kosiku
         if (!$cart || $cart->items->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
         }
@@ -32,34 +31,32 @@ class OrderController extends Controller
         return view('checkout', compact('cart'));
     }
 
-    /**
-     * Process order + clear cart
-     */
+
     public function placeOrder(Request $request)
     {
         $user = Auth::user();
 
-        // get cart
+        // nacitame kosik aj s produktmi
         $cart = Cart::with('items.product')->where('user_id', $user->id)->first();
 
         if (!$cart || $cart->items->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
 
-        // calculate total
+        // vypocet celkovej sumy objednavky
         $total = 0;
         foreach ($cart->items as $item) {
             $total += $item->quantity * $item->product->price;
         }
 
-        // create order
+        // vytvorenie objednavky
         $order = Order::create([
             'user_id' => $user->id,
             'total_price' => $total,
-            'status' => 'pending', // pending, paid, shipped, etc.
+            'status' => 'pending',
         ]);
 
-        // create order items
+        // vytvorenie poloziek objednavky z poloziek kosika
         foreach ($cart->items as $item) {
             OrderItem::create([
                 'order_id'  => $order->id,
@@ -69,7 +66,7 @@ class OrderController extends Controller
             ]);
         }
 
-        // clear cart
+        // vycistenie kosika po vytvoreni objednavky
         $cart->items()->delete();
 
         return redirect()->route('home')->with('success', 'Order placed successfully!');

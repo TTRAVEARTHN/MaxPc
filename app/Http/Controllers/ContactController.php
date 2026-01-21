@@ -9,11 +9,13 @@ class ContactController extends Controller
 {
     public function show()
     {
+        // kontakt formular
         return view('contact');
     }
 
     public function send(Request $request)
     {
+
         $data = $request->validate([
             'name'    => 'required|string|max:100',
             'email'   => 'required|email|max:150',
@@ -32,6 +34,7 @@ class ContactController extends Controller
             function ($message) use ($data, $toEmail) {
                 $message->to($toEmail)
                     ->subject('New message from contact form')
+                    // replyto nastavime na email od odosielatela
                     ->replyTo($data['email'], $data['name']);
             }
         );
