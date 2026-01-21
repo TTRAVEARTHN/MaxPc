@@ -1,0 +1,99 @@
+Návod na inštaláciu
+=====================================
+
+1. Požiadavky
+- PHP 8.0 alebo vyššie
+- Composer
+- Node.js + npm
+- PostgreSQL
+
+2. Pred inštaláciou
+Uistite sa, že máte nainštalované všetky požadované nástroje a prístup k PostgreSQL databáze.
+
+3. Stiahnutie projektu
+Projekt je potrebné naklonovať do lokálneho prostredia:
+
+git clone <repo-url>
+cd maxpc
+
+4. Inštalácia backend závislostí
+V koreňovom adresári projektu spustite:
+
+composer install
+
+5. Inštalácia frontend závislostí
+
+npm install
+
+6. Konfigurácia prostredia
+V koreňovom adresári projektu je potrebné vytvoriť súbor .env zo vzorového súboru:
+
+# Unix / Git Bash
+cp .env.example .env
+
+# Windows PowerShell (alternatíva)
+copy .env.example .env
+
+Následne upravte (alebo doplňte) databázové nastavenia v súbore `.env`, napríklad pre PostgreSQL:
+
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=postgres
+DB_USERNAME=postgres
+DB_PASSWORD=1234
+
+(Prípadne upravte hodnoty podľa vášho lokálneho prostredia.)
+
+7. Generovanie aplikačného kľúča
+
+php artisan key:generate
+
+8. Migrácie databázy
+Vytvorenie databázovej štruktúry spustením migrácií:
+
+php artisan migrate
+
+8.1 Spusť Laravel Tinker
+php artisan tinker
+
+// Vlož do databázy admin používateľa
+$user = new App\Models\User();
+$user->name = "Admin";
+$user->email = "admin@example.com";
+$user->password = bcrypt("password123");
+$user->role = "admin";   // dôležité – určuje administrátora
+$user->address = "Admin Street 1";
+$user->save();
+Ak sa všetko podarilo, Tinker vráti true.
+
+// Vlož do databázy kategórie produktov
+App\Models\Category::create(['name' => 'Gaming PCs']);
+App\Models\Category::create(['name' => 'Workstations']);
+App\Models\Category::create(['name' => 'Office PCs']);
+App\Models\Category::create(['name' => 'Monitors']);
+
+
+9. Prepojenie storage pre obrázky
+Aplikácia ukladá obrázky do adresára `storage`; pre verejný prístup vytvorte symbolický link:
+
+php artisan storage:link
+
+Poznámka pre Windows: ak príkaz zlyhá kvôli právam alebo symlinkom, spustite PowerShell ako administrátor a použite alternatívu:
+
+mklink /J public\\storage storage\\app\\public
+
+10. Spustenie aplikácie
+Spustenie Laravel development servera:
+
+php artisan serve
+
+Spustenie frontend build nástroja (vývojový režim):
+
+npm run dev
+
+Aplikácia bude dostupná na adrese:
+
+http://127.0.0.1:8000
+Ďalšie tipy
+Prajem úspešnú inštaláciu!

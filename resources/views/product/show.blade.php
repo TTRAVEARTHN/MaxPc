@@ -18,18 +18,12 @@
 
         <div class="product-layout">
 
-            {{-- ======================= --}}
-            {{-- LEFT COLUMN — IMAGE --}}
-            {{-- ======================= --}}
             <div>
                 <img src="{{ $product->main_image ? asset('storage/' .$product->main_image) : '/images/fallback-pc.png' }}"
                      alt="{{ $product->name }}"
                      class="product-main-img">
             </div>
 
-            {{-- ======================= --}}
-            {{-- RIGHT COLUMN — DETAILS --}}
-            {{-- ======================= --}}
             <div>
 
                 {{-- PRICE --}}
