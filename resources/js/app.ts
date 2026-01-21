@@ -12,6 +12,7 @@ import "./catalog/categoryFilter";
 import "./cart/cartAfterActions";
 import "./compare/compareAjax"
 import "./favorites/favoritesAjax";
+import "./flash/succecError";
 
 
 // only mount App.vue if there's a #app element in the page

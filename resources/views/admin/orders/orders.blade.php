@@ -4,15 +4,38 @@
 
     <div class="page-container">
 
-        <h1 class="page-title">Orders</h1>
+        {{-- HEADER + search --}}
+        <div class="mb-6">
+            <h1 class="page-title mb-4">Orders</h1>
+
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+
+                {{-- SEARCH FORM (id, name, email) --}}
+                <form method="GET"
+                      action="{{ route('admin.orders') }}"
+                      class="flex w-full sm:w-auto gap-2">
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ $search ?? request('search') }}"
+                        placeholder="Search by ID, user name or email..."
+                        class="input flex-1 min-w-0"
+                    >
+                    <button class="gray-btn px-4 py-2 whitespace-nowrap">
+                        Search
+                    </button>
+                </form>
+
+            </div>
+        </div>
 
         @if($orders->isEmpty())
             <p class="text-gray-400">No orders found.</p>
         @else
 
-            <div class="card-box">
+            <div class="card-box overflow-x-auto">
 
-                <table class="table">
+                <table class="table min-w-[800px]">
                     <thead>
                     <tr>
                         <th>Order #</th>
@@ -28,12 +51,16 @@
                     <tbody>
                     @foreach($orders as $order)
                         <tr>
-
                             {{-- ID --}}
                             <td>{{ $order->id }}</td>
 
                             {{-- USER --}}
-                            <td>{{ $order->user->name }}</td>
+                            <td>
+                                <div class="font-semibold">{{ $order->user->name }}</div>
+                                <div class="text-xs text-gray-400">
+                                    {{ $order->user->email }}
+                                </div>
+                            </td>
 
                             {{-- ITEMS --}}
                             <td class="text-gray-300">
@@ -50,13 +77,13 @@
 
                             {{-- STATUS --}}
                             <td>
-                                <form method="POST" action="{{ route('admin.orders.updateStatus', $order->id) }}">
+                                <form method="POST"
+                                      action="{{ route('admin.orders.updateStatus', $order->id) }}">
                                     @csrf
                                     @method('PATCH')
                                     <select name="status"
                                             class="select"
                                             onchange="this.form.submit()">
-
                                         <option value="pending"   @selected($order->status=='pending')>Pending</option>
                                         <option value="paid"      @selected($order->status=='paid')>Paid</option>
                                         <option value="shipped"   @selected($order->status=='shipped')>Shipped</option>
@@ -85,8 +112,12 @@
                         </tr>
                     @endforeach
                     </tbody>
-
                 </table>
+
+                {{-- PAGINATION --}}
+                <div class="mt-4">
+                    {{ $orders->links() }}
+                </div>
 
             </div>
 
