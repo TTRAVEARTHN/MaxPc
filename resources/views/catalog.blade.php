@@ -20,7 +20,7 @@
         {{-- =============================== --}}
         {{-- CATEGORY FILTERS --}}
         {{-- =============================== --}}
-        <div class="flex gap-3 mb-6">
+        <div class="flex flex-wrap gap-3 mb-6">
 
             {{-- ALL PRODUCTS --}}
             <a href="{{ route('catalog.index', ['sort' => $currentSort !== 'default' ? $currentSort : null]) }}"

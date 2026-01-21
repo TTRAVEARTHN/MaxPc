@@ -71,13 +71,14 @@
                     $isPc = $product->category && in_array($product->category->name, $pcCategories);
                 @endphp
 
-                <div class="flex gap-4 mt-8">
+                {{-- na mobile dame tlacidla pod seba, na sirsich obrazovkach do riadku --}}
+                <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 mt-8">
 
                     <form method="POST"
                           action="{{ route('cart.add', $product->id) }}"
                           data-cart-form="add">
                         @csrf
-                        <button class="blue-btn px-6 py-3 rounded-lg">
+                        <button class="blue-btn px-6 py-3 rounded-lg w-full sm:w-auto text-center">
                             Add to Cart
                         </button>
                     </form>
@@ -87,7 +88,7 @@
                           action="{{ route('favorites.add', $product->id) }}"
                           data-favorite-form="add">
                         @csrf
-                        <button class="gray-btn px-6 py-3 rounded-lg">
+                        <button class="gray-btn px-6 py-3 rounded-lg w-full sm:w-auto text-center">
                             Favorite
                         </button>
                     </form>
@@ -97,14 +98,15 @@
                               action="{{ route('compare.add', $product->id) }}"
                               data-compare-form="add">
                             @csrf
-                            <button type="submit" class="gray-btn px-6 py-3 rounded-lg">
+                            <button type="submit"
+                                    class="gray-btn px-6 py-3 rounded-lg w-full sm:w-auto text-center">
                                 Add to Compare
                             </button>
                         </form>
                     @endif
 
                     <a href="{{ route('catalog.index') }}"
-                       class="gray-btn px-6 py-3 rounded-lg">
+                       class="gray-btn px-6 py-3 rounded-lg w-full sm:w-auto text-center">
                         Back to Catalog
                     </a>
 

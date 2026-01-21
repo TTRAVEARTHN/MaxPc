@@ -1,4 +1,7 @@
+import { initCartForms } from '../cart/cartAfterActions';
+import { initFavoriteForms } from '../favorites/favoritesAjax';
 document.addEventListener("DOMContentLoaded", () => {
+
     const categoryLinks = document.querySelectorAll<HTMLAnchorElement>('[data-category-link]');
     const catalogGridRaw   = document.querySelector<HTMLDivElement>('#catalogGrid');
     const productCountRaw  = document.querySelector<HTMLElement>('#productCount');
@@ -36,6 +39,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 // aktualizujeme HTML katalogu a pocet produktov
                 catalogGrid.innerHTML = data.html;
                 productCount.textContent = `${data.total} products`;
+
+                // po vymene HTML musime znova naviazat AJAX na nove cart formy
+                initCartForms(catalogGrid);
+                initFavoriteForms(catalogGrid);
 
                 // do historiky zapiseme cisty URL bez ajaxu
                 window.history.pushState({}, "", url);

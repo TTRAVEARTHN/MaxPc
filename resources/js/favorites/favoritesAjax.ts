@@ -1,7 +1,6 @@
-function syncFavoritesBadge(): void {
-    const el = document.querySelector<HTMLElement>('#favoritesCount');
-    // ak nie je badge v DOM nema zmysel robit request
-    if (!el) return;
+export function syncFavoritesBadge(): void {
+    const els = document.querySelectorAll<HTMLElement>('.js-favorites-count');
+    if (!els.length) return;
 
     fetch('/favorites/count', {
         method: 'GET',
@@ -14,40 +13,46 @@ function syncFavoritesBadge(): void {
         .then(data => {
             const count = Number(data.count ?? 0);
 
-            // zobraz badge ak je viac ako 0
-            if (count > 0) {
-                el.textContent = String(count);
-                el.classList.remove('hidden');
-            } else {
-                // skry badge ked je prazdne
-                el.textContent = '';
-                el.classList.add('hidden');
-            }
+            els.forEach(el => {
+                // ak je aspon 1 oblubeny tak zobrazime badge
+                if (count > 0) {
+                    el.textContent = String(count);
+                    el.classList.remove('hidden');
+                } else {
+                    // inak skryjeme
+                    el.textContent = '';
+                    el.classList.add('hidden');
+                }
+            });
         })
         .catch(err => console.error('Favorites count error:', err));
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // hned po loade vytiahneme pocet obubenych
-    syncFavoritesBadge();
-
-    // najdeme formy pre "add" a "remove"
-    const forms = document.querySelectorAll<HTMLFormElement>('form[data-favorite-form]');
+// inicializacia AJAX logiky pre formy obubenych
+export function initFavoriteForms(root: ParentNode = document): void {
+    // hladame formy v konkretnom kontajneri (napr. katalogGrid)
+    const forms = root.querySelectorAll<HTMLFormElement>('form[data-favorite-form]');
     if (!forms.length) return;
 
     const csrfMeta = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]');
     const csrfToken = csrfMeta ? csrfMeta.content : '';
 
     forms.forEach(form => {
+        // aby sme nepridali handler viac krat
+        if ((form as any)._favoritesBound) {
+            return;
+        }
+        (form as any)._favoritesBound = true;
+
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
             const formData = new FormData(form);
-            const spoofMethod = (form.querySelector('input[name="_method"]') as HTMLInputElement | null)?.value;
+            const spoofMethod =
+                (form.querySelector('input[name="_method"]') as HTMLInputElement | null)?.value;
             const realMethod = spoofMethod ? 'POST' : (form.method || 'POST');
-            const actionType = form.dataset.favoriteForm; // "add"  "remove"
+            const actionType = form.dataset.favoriteForm; // "add" | "remove"
 
-            //posielame AJAX request
             fetch(form.action, {
                 method: realMethod.toUpperCase(),
                 headers: {
@@ -59,18 +64,17 @@ document.addEventListener('DOMContentLoaded', () => {
             })
                 .then(res => res.json().catch(() => ({})))
                 .then(data => {
-                    // ak user nie je prihlaseny, posielame na login
+                    // neautorizovany user -> presmerujeme na login
                     if (data.redirect_to_login && data.login_url) {
                         window.location.href = data.login_url;
                         return;
                     }
 
-                    // odstranenie karty zo stranky obubenych
+                    // ak ide o odstranenie obubeneho na stranke favorites
                     if (actionType === 'remove') {
                         const item = form.closest<HTMLElement>('.favorite-item, .product-card');
                         if (item) item.remove();
 
-                        // ked uz nema co zobrazit tak ukazeme prazdnu hlasku
                         const wrapper = document.querySelector<HTMLElement>('#favoritesWrapper');
                         const hasItems = wrapper?.querySelectorAll('.favorite-item, .product-card').length ?? 0;
                         if (wrapper && !hasItems) {
@@ -79,15 +83,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
-                    // po kazdej akcii aktualizujeme badge v headeri
+                    // po kazdej akcii aktualizujeme badge
                     syncFavoritesBadge();
                 })
                 .catch(err => console.error('Favorite AJAX error:', err));
         });
     });
+}
+
+// pri prvom nacitani stranky nastavime badge a AJAX
+document.addEventListener('DOMContentLoaded', () => {
+    syncFavoritesBadge();
+    initFavoriteForms(document);
 });
 
-// pri navrate cez "back" znovu zosynchronizujeme badge
+// pri navrate z bfcache znovu zosynchronizujeme badge
 window.addEventListener('pageshow', (event) => {
     if (event.persisted) {
         syncFavoritesBadge();

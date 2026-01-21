@@ -8,8 +8,6 @@ function formatMoney(value: number): string {
     });
 }
 
-
-
 function recalcCartSummary() {
     // prechadzame vsetky polozky v kosiku a rucne prepocitame sumy
     const itemEls = document.querySelectorAll<HTMLDivElement>('.cart-item');
@@ -22,10 +20,8 @@ function recalcCartSummary() {
         subtotal += price * qty;
     });
 
-
     const tax = subtotal * 0.20;
     const total = subtotal; // ak je DPH uz v cene, tak total = subtotal
-
 
     const subtotalEl = document.querySelector<HTMLElement>('#cartSubtotal');
     const taxEl      = document.querySelector<HTMLElement>('#cartTax');
@@ -38,9 +34,9 @@ function recalcCartSummary() {
 }
 
 function syncCartBadge() {
-    const cartCountEl = document.querySelector<HTMLElement>('#cartCount');
-    // ak v hlavicke nie je badge tak neriesime
-    if (!cartCountEl) return;
+    // najdeme vsetky badge pre kosik (desktop + mobile)
+    const cartCountEls = document.querySelectorAll<HTMLElement>('.js-cart-count');
+    if (!cartCountEls.length) return;
 
     fetch('/cart/count', {
         method: 'GET',
@@ -52,35 +48,39 @@ function syncCartBadge() {
         .then(res => res.json())
         .then(data => {
             const count = Number(data.count ?? 0);
-            // zobrazime badge len ked je nieco v kosiku
 
-            if (count > 0) {
-                cartCountEl.textContent = String(count);
-                cartCountEl.classList.remove('hidden');
-            } else {
-                cartCountEl.classList.add('hidden');
-            }
+            cartCountEls.forEach(el => {
+                // zobrazime alebo skryjeme badge podla poctu
+                if (count > 0) {
+                    el.textContent = String(count);
+                    el.classList.remove('hidden');
+                } else {
+                    el.textContent = '';
+                    el.classList.add('hidden');
+                }
+            });
         })
         .catch(err => console.error('Cart badge sync error:', err));
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    // pri kazdom loade stranky zosynchronizujeme badge
-    syncCartBadge();
 
-
-
-    const forms = document.querySelectorAll<HTMLFormElement>('form[data-cart-form]');
-    // ak na stranke nie su ziadne cart formy tak dalej neviazeme handlery
+export function initCartForms(root: ParentNode = document): void {
+    // najdeme formy len v ramci daneho rootu
+    const forms = root.querySelectorAll<HTMLFormElement>('form[data-cart-form]');
+    // ak v root nie su ziadne cart formy tak nic neriesime
     if (!forms.length) return;
 
     const csrfMeta = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]');
-
     const csrfToken = csrfMeta ? csrfMeta.content : '';
 
     forms.forEach(form => {
-        form.addEventListener("submit", (e) => {
+        // ochrana aby sme na ten isty form nepridali listener viackrat
+        if ((form as any)._cartHandlerAttached) {
+            return;
+        }
+        (form as any)._cartHandlerAttached = true;
 
+        form.addEventListener("submit", (e) => {
             e.preventDefault();
 
             const formData = new FormData(form);
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const realMethod = spoofMethod ? 'POST' : (form.method || 'POST');
             const actionType = form.dataset.cartForm; // "add" | "update" | "remove"
 
-            // AJAX request namiesto klasickeho submitu
+            // AJAX request
             fetch(form.action, {
                 method: realMethod.toUpperCase(),
                 headers: {
@@ -146,7 +146,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     const remainingItems = itemsWrapper?.querySelectorAll('.cart-item') ?? [];
                     const emptyMsg = document.querySelector<HTMLElement>('#emptyCartMessage');
 
-
                     if (remainingItems.length === 0) {
                         if (emptyMsg) {
                             emptyMsg.classList.remove('hidden');
@@ -168,7 +167,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
         });
     });
+}
 
+// inicializacia pri prvom nacitani celej stranky
+document.addEventListener("DOMContentLoaded", () => {
+    // pri kazdom loade stranky zosynchronizujeme badge
+    syncCartBadge();
+
+    // naviazeme AJAX na vsetky cart formy v dokumente
+    initCartForms(document);
 });
 
 // ked sa vratime naspat (bfcache), tak si dotiahneme aktualny pocet z backendu

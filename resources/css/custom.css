@@ -33,11 +33,18 @@
     transform: translateY(-8px) rotate(-45deg);
 }
 .mobile-link {
+    display: block;                 /* vsetko po sirke riadku klikatelne */
+    width: 100%;                    /* plna sirka kontajnera */
     padding: 12px 20px;
     color: #d1d5db;
     transition: .2s;
+
+    -webkit-tap-highlight-color: transparent; /* zrusime modry highlight v mobile */
+    user-select: none;                         /* text sa neda oznacovat */
 }
-.mobile-link:hover {
+
+.mobile-link:hover,
+.mobile-link:active {               /* active pre realny tap na mobile */
     background: #2b3142;
     color: white;
 }
@@ -320,15 +327,18 @@
 .gray-btn:hover {
     background-color: #3a4153;
 }
+
+
 /* CART ITEM */
 .cart-item {
     background: #1f2635;
     padding: 16px;
     border-radius: 10px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 12px;
 }
+
 
 
 

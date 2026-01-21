@@ -1,7 +1,8 @@
-function syncCompareBadge() {
-    const el = document.querySelector<HTMLElement>('#compareCount');
-    // ak badge neexistuje tak dalej neriesime
-    if (!el) return;
+function syncCompareBadge(): void {
+    // vsetky badge pre porovnanie (desktop + mobil)
+    const els = document.querySelectorAll<HTMLElement>('.js-compare-count');
+    // ak nie je nic na stranke, ukoncime
+    if (!els.length) return;
 
     fetch('/compare/count', {
         method: 'GET',
@@ -14,14 +15,15 @@ function syncCompareBadge() {
         .then(data => {
             const count = Number(data.count) || 0;
 
-            // zobrazime badge ked je > 0
-            if (count > 0) {
-                el.textContent = String(count);
-                el.classList.remove('hidden');
-            } else {
-                el.textContent = '';
-                el.classList.add('hidden');
-            }
+            els.forEach(el => {
+                if (count > 0) {
+                    el.textContent = String(count);
+                    el.classList.remove('hidden');
+                } else {
+                    el.textContent = '';
+                    el.classList.add('hidden');
+                }
+            });
         })
         .catch(err => console.error('Compare count error:', err));
 }

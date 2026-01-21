@@ -69,9 +69,9 @@
             <a href="{{ route('favorites.index') }}" class="nav-btn relative">
                 Favorites
                 <span id="favoritesCount"
-                      class="ml-1 px-2 py-0.5 text-xs rounded bg-blue-500
-                 {{ $favoritesCount > 0 ? '' : 'hidden' }}">
-                     {{ $favoritesCount }}
+                      class="ml-1 px-2 py-0.5 text-xs rounded bg-blue-500 js-favorites-count
+                    {{ $favoritesCount > 0 ? '' : 'hidden' }}">
+                    {{ $favoritesCount }}
                 </span>
             </a>
 
@@ -79,9 +79,19 @@
             <a href="{{ route('compare.index') }}" class="nav-btn relative">
                 Compare
                 <span id="compareCount"
-                      class="ml-1 px-2 py-0.5 text-xs rounded bg-blue-500
-                             {{ $compareCount > 0 ? '' : 'hidden' }}">
-                    {{ $compareCount }}
+                      class="ml-1 px-2 py-0.5 text-xs rounded bg-blue-500 js-compare-count
+                    {{ $compareCount > 0 ? '' : 'hidden' }}">
+                     {{ $compareCount }}
+                </span>
+            </a>
+
+            {{-- CART --}}
+            <a href="{{ route('cart.index') }}" class="nav-btn relative">
+                Cart
+                <span id="cartCount"
+                      class="ml-1 text-xs bg-blue-500 px-1.5 py-0.5 rounded js-cart-count
+                         {{ $cartCount ? '' : 'hidden' }}">
+                    {{ $cartCount }}
                 </span>
             </a>
 
@@ -131,14 +141,7 @@
                 @endguest
             </div>
 
-            {{-- CART --}}
-            <a href="{{ route('cart.index') }}" class="nav-btn relative">
-                Cart
-                <span id="cartCount"
-                      class="ml-1 text-xs bg-blue-500 px-1.5 py-0.5 rounded {{ $cartCount ? '' : 'hidden' }}">
-                    {{ $cartCount }}
-                </span>
-            </a>
+
         </div>
 
         {{-- HAMBURGER (only mobile) --}}
@@ -159,39 +162,36 @@
 
             <li class="border-t border-gray-700 my-2"></li>
 
-            {{-- FAVORITES + COMPARE + CART c теми же счётчиками --}}
             <li>
                 <a href="{{ route('favorites.index') }}" class="mobile-link flex items-center justify-between">
                     <span>Favorites</span>
-                    @if($favoritesCount > 0)
-                        <span class="ml-2 text-xs bg-blue-500 px-1.5 py-0.5 rounded">
-                            {{ $favoritesCount }}
-                        </span>
-                    @endif
+                    <span class="ml-2 text-xs bg-blue-500 px-1.5 py-0.5 rounded js-favorites-count
+                     {{ $favoritesCount > 0 ? '' : 'hidden' }}">
+                        {{ $favoritesCount ?: '' }}
+                    </span>
                 </a>
             </li>
 
             <li>
                 <a href="{{ route('compare.index') }}" class="mobile-link flex items-center justify-between">
                     <span>Compare</span>
-                    @if($compareCount > 0)
-                        <span class="ml-2 text-xs bg-blue-500 px-1.5 py-0.5 rounded">
-                            {{ $compareCount }}
-                        </span>
-                    @endif
+                    <span class="ml-2 text-xs bg-blue-500 px-1.5 py-0.5 rounded js-compare-count
+                     {{ $compareCount > 0 ? '' : 'hidden' }}">
+                        {{ $compareCount ?: '' }}
+                     </span>
                 </a>
             </li>
 
             <li>
                 <a href="{{ route('cart.index') }}" class="mobile-link flex items-center justify-between">
                     <span>Cart</span>
-                    @if($cartCount > 0)
-                        <span class="ml-2 text-xs bg-blue-500 px-1.5 py-0.5 rounded">
-                            {{ $cartCount }}
-                        </span>
-                    @endif
+                    <span class="ml-2 text-xs bg-blue-500 px-1.5 py-0.5 rounded js-cart-count
+                     {{ $cartCount > 0 ? '' : 'hidden' }}">
+                        {{ $cartCount ?: '' }}
+                    </span>
                 </a>
             </li>
+
 
             <li class="border-t border-gray-700 my-2"></li>
 
