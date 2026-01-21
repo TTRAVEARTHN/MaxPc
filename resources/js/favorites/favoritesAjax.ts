@@ -1,5 +1,6 @@
 function syncFavoritesBadge(): void {
     const el = document.querySelector<HTMLElement>('#favoritesCount');
+    // ak nie je badge v DOM nema zmysel robit request
     if (!el) return;
 
     fetch('/favorites/count', {
@@ -28,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // сразу подтягиваем счётчик
     syncFavoritesBadge();
 
-    // навешиваем AJAX на все формы избранного
+    // naviazeme AJAX spravanie na vsetky formy pre favorites
     const forms = document.querySelectorAll<HTMLFormElement>('form[data-favorite-form]');
     if (!forms.length) return;
 
@@ -55,13 +56,13 @@ document.addEventListener('DOMContentLoaded', () => {
             })
                 .then(res => res.json().catch(() => ({})))
                 .then(data => {
-                    // не авторизован — уводим на логин
+                    // neautorizovany user  presmerujeme na login
                     if (data.redirect_to_login && data.login_url) {
                         window.location.href = data.login_url;
                         return;
                     }
 
-                    // УДАЛЕНИЕ: убираем карточку на странице избранного
+                    // odstranenie karty zo stranky obubenych
                     if (actionType === 'remove') {
                         const item = form.closest<HTMLElement>('.favorite-item, .product-card');
                         if (item) item.remove();
@@ -74,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
-                    // после любого действия обновляем бейдж
+                    // po kazdej akcii aktualizujeme badge v headeri
                     syncFavoritesBadge();
                 })
                 .catch(err => console.error('Favorite AJAX error:', err));
@@ -82,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// при возврате по Back (bfcache)
+// pri navrate cez "back" znovu zosynchronizujeme badge
 window.addEventListener('pageshow', (event) => {
     if (event.persisted) {
         syncFavoritesBadge();

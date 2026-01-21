@@ -1,12 +1,13 @@
 import { showError } from "./helpers";
 document.addEventListener("DOMContentLoaded", () => {
+    //explicitny cast na form
     const form = document.getElementById("registerForm") as HTMLFormElement;
     if (!form) return;
 
     form.addEventListener("submit", (e) => {
         let valid = true;
 
-        // clear old errors
+        // vycistenie starych chyb pred novou validaciou
         document.querySelectorAll(".input-error").forEach(el => el.textContent = "");
         document.querySelectorAll(".input").forEach(el => el.classList.remove("error"));
 
@@ -36,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
             valid = false;
         }
 
+        // zrusime odoslanie formulara ak je chyba
         if (!valid) {
             e.preventDefault();
         }

@@ -20,7 +20,7 @@
                     @php($product = $fav->product)
                     @if(!$product) @continue @endif
 
-                    {{-- добавил favorite-item, чтобы favoritesAfterActions.ts мог удалить карточку --}}
+
                     <div class="product-card favorite-item">
 
                         <a href="{{ route('product.show', $product) }}">

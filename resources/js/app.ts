@@ -12,7 +12,6 @@ import "./catalog/categoryFilter";
 import "./cart/cartAjax";
 import "./cart/cartCounter";
 import "./cart/cartAfterActions";
-import "./compare/compareCounter"
 import "./compare/compareAjax"
 import "./favorites/favoritesAjax";
 
